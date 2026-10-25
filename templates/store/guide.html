@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}এন্টারপ্রাইজ আর্কিটেকচার গাইড | Weaverel{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Hero / Title -->
+    <div class="border-b border-stone-200 pb-8 mb-10">
+        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+            📘 এন্টারপ্রাইজ ক্লোথিং ওয়েবসাইট গাইড
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black font-serif-title text-stone-900 tracking-tight">
+            Weaverel কীভাবে তৈরি করা হয়েছে: সহজ বাংলায় সম্পূর্ণ নির্দেশিকা
+        </h1>
+        <p class="text-stone-600 text-sm sm:text-base mt-3 max-w-3xl leading-relaxed">
+            এই ওয়েবসাইটটি একটি পূর্ণাঙ্গ এন্টারপ্রাইজ কাপড়ের ব্যবসা পরিচালনার উপযোগী করে তৈরি করা হয়েছে। এখানে কীভাবে এডমিন প্যানেল থেকে পাঞ্জাবি, শার্ট বা নতুন ক্যাটাগরি তৈরি করবেন এবং অর্ডার পরিচালনা করবেন — তা নিচে বিস্তারিত ব্যাখ্যা করা হলো।
+        </p>
+    </div>
+
+    <!-- Section 1: Admin Category Management -->
+    <section class="space-y-4 mb-14">
+        <h2 class="text-2xl font-bold font-serif-title text-stone-900 flex items-center gap-2">
+            <span>১.</span> এডমিন কীভাবে ক্যাটাগরি পরিবর্তন করবেন (পাঞ্জাবি, শার্ট, টি-শার্ট ইত্যাদি)
+        </h2>
+        <p class="text-stone-600 text-sm leading-relaxed">
+            ওয়েবসাইটের কোনো ক্যাটাগরিই কোডিং-এ ফিক্সড বা হার্ডকোড করা নয়। সব ক্যাটাগরি সরাসরি ডাটাবেজ থেকে লাইভ লোড হয়:
+        </p>
+
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-4 text-xs sm:text-sm">
+            <div class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">১</span>
+                <div>
+                    <strong class="text-stone-900">এডমিন প্যানেলে যান:</strong>
+                    ব্রাউজারে <code>http://127.0.0.1:8000/admin/</code> ওপেন করুন। (ইউজার: <code>admin</code>, পাসওয়ার্ড: <code>admin123</code>)।
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">২</span>
+                <div>
+                    <strong class="text-stone-900">Categories অপশনে ক্লিক করুন:</strong>
+                    এখানে আপনি দেখতে পাবেন: <em>Panjabi (পাঞ্জাবি)</em>, <em>Shirts (শার্ট)</em>, <em>T-Shirts (টি-শার্ট)</em> ইত্যাদি।
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">৩</span>
+                <div>
+                    <strong class="text-stone-900">পরিবর্তন বা নতুন ক্যাটাগরি যোগ করুন:</strong>
+                    আপনি যেকোনো ক্যাটাগরির নাম পরিবর্তন করতে পারেন (যেমন: <em>কাবলি সেট</em>, <em>পোলো শার্ট</em>, <em>কটন প্যান্ট</em>)। <strong>Save</strong> বাটনে ক্লিক করলেই স্বয়ংক্রিয়ভাবে ওয়েবসাইটের মেনু ও ফিল্টারে সাথে সাথে পরিবর্তন হয়ে যাবে!
+                </div>
+            </div>
+
+            <div class="pt-3">
+                <a href="/admin/store/category/" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-900 text-white text-xs font-bold rounded-lg hover:bg-stone-800 transition">
+                    <span>ক্যাটাগরি ম্যানেজমেন্টে যান →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: BDT Pricing & Checkout Architecture -->
+    <section class="space-y-4 mb-14">
+        <h2 class="text-2xl font-bold font-serif-title text-stone-900 flex items-center gap-2">
+            <span>২.</span> বাংলাদেশি টাকা (BDT ৳) ও ক্যাশ অন ডেলিভারি সিস্টেম
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                <span class="text-3xl">৳</span>
+                <h3 class="font-bold text-stone-900 text-sm">১. BDT কারেন্সি ও ডিসকাউন্ট</h3>
+                <p class="text-stone-500 text-xs leading-relaxed">
+                    পাঞ্জাবি, শার্ট ইত্যাদির দাম টাকায় নির্ধারিত (যেমন: ৳ ১,৯৫০)। ডিসকাউন্ট মূল্য সেট করলে সিস্টেমে স্বয়ংক্রিয়ভাবে শতকরা ছাড় হিসাব হয়ে যায়।
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                <span class="text-3xl">🚚</span>
+                <h3 class="font-bold text-stone-900 text-sm">২. ৩টি ডেলিভারি জোন</h3>
+                <p class="text-stone-500 text-xs leading-relaxed">
+                    ঢাকা মেট্রো (৳ ৭০), ঢাকা সাব-এরিয়া (৳ ১০০) এবং ঢাকার বাইরে সমগ্র বাংলাদেশ (৳ ১৩০)। ৳ ২,৫০০ এর বেশি অর্ডারে স্বয়ংক্রিয় ফ্রি ডেলিভারি।
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                <span class="text-3xl">📋</span>
+                <h3 class="font-bold text-stone-900 text-sm">৩. ডাটাবেজ অর্ডার ট্র্যাকিং</h3>
+                <p class="text-stone-500 text-xs leading-relaxed">
+                    গ্রাহক অর্ডার দেওয়ার সাথে সাথে ডাটাবেজে একটি <code>Order</code> ও <code>OrderItem</code> রেকর্ড তৈরি হয় এবং স্টক থেকে স্বয়ংক্রিয়ভাবে সংখ্যা কমে যায়।
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: File Map -->
+    <section class="space-y-4 mb-14">
+        <h2 class="text-2xl font-bold font-serif-title text-stone-900 flex items-center gap-2">
+            <span>৩.</span> কোন ফাইলের কাজ কী? (File Overview)
+        </h2>
+
+        <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden divide-y divide-stone-100 text-xs">
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2 bg-stone-50 font-bold text-stone-700">
+                <span>ফাইল / ডিরেক্টরি</span>
+                <span class="md:col-span-2">মূল কাজ</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">store/models.py</code>
+                <span class="md:col-span-2 text-stone-600">Category এবং Product টেবিল — কাপড়, সাইজ, বিডিটি প্রাইস, স্টক ইত্যাদি সংরক্ষণ করে।</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">orders/models.py</code>
+                <span class="md:col-span-2 text-stone-600">গ্রাহকের নাম, মোবাইল নম্বর, ঠিকানা, ডেলিভারি এলাকা এবং ক্রয়কৃত পোশাকের অর্ডার ডাটাবেজ।</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">store/admin.py</code>
+                <span class="md:col-span-2 text-stone-600">এডমিনে ক্যাটাগরি সাজানো, পাঞ্জাবি/শার্টের দাম ও স্টক সরাসরি পরিবর্তন করার প্যানেল।</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">orders/admin.py</code>
+                <span class="md:col-span-2 text-stone-600">সকল গ্রাহকের অর্ডারের তালিকা, স্ট্যাটাস পরিবর্তন (Confirmed, Shipped, Delivered) করার সুবিধা।</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">cart/views.py</code>
+                <span class="md:col-span-2 text-stone-600">শপিং ব্যাগে পণ্য যোগ করা, সংখ্যা বাড়ানো/কমানো এবং ক্যাশ অন ডেলিভারি চেকআউট প্রসেস।</span>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <code class="font-bold text-stone-900">store/context_processors.py</code>
+                <span class="md:col-span-2 text-stone-600">এডমিন যেকোনো নতুন ক্যাটাগরি যোগ করলে স্বয়ংক্রিয়ভাবে পুরো সাইটের মেনুতে পৌঁছে দেওয়ার ইঞ্জিন।</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Return Button -->
+    <div class="text-center pt-4">
+        <a href="{% url 'store:home' %}" class="px-8 py-3.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition shadow">
+            ← প্রধান স্টোরফ্রন্টে ফিরে যান (Go to Storefront)
+        </a>
+    </div>
+
+</div>
+{% endblock %}

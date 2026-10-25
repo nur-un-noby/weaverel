@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}Weaverel | প্রিমিয়াম পাঞ্জাবি, শার্ট ও টি-শার্ট কালেকশন (BDT ৳){% endblock %}
+
+{% block content %}
+<!-- Full-Width Hero Section -->
+<section class="relative bg-stone-950 text-white overflow-hidden py-16 sm:py-24 lg:py-28">
+    <div class="absolute inset-0 opacity-35 mix-blend-overlay">
+        <img 
+            src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80" 
+            alt="Clothing Store" 
+            class="w-full h-full object-cover"
+        >
+    </div>
+    <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 relative z-10">
+        <div class="max-w-4xl space-y-5">
+            <span class="inline-block px-4 py-1.5 bg-amber-500/20 text-amber-300 text-xs font-bold tracking-widest uppercase rounded-full border border-amber-500/40">
+                ✨ নতুন ঈদ ও ফেস্টিভ কালেকশন ২০২৬
+            </span>
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight font-serif-title leading-tight">
+                খাঁটি কাপড়ে তৈরি স্টাইলিশ পাঞ্জাবি, শার্ট ও টি-শার্ট
+            </h1>
+            <p class="text-stone-300 text-sm sm:text-base font-normal leading-relaxed max-w-2xl">
+                ১০০% কম্বড সুতি ও লিনেন ফেব্রিকে তৈরি প্রিমিয়াম পোশাক। নিখুঁত সেলাই, আধুনিক ফিটিং এবং সারা বাংলাদেশে দ্রুত ক্যাশ অন ডেলিভারি।
+            </p>
+            <div class="flex flex-wrap items-center gap-3.5 pt-3">
+                <a href="#products-grid" class="px-8 py-3.5 bg-amber-500 hover:bg-amber-600 text-stone-950 text-sm font-bold rounded-xl transition shadow-lg">
+                    পণ্যসমূহ দেখুন (Shop Now) ↓
+                </a>
+                <a href="{% url 'store:home' %}?category=panjabi" class="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition backdrop-blur border border-white/20">
+                    পাঞ্জাবি কালেকশন →
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Visual Category Navigation (Circle Avatars - Highly Usable & Attractive) -->
+<section class="border-b border-stone-200 bg-white py-8">
+    <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16">
+        <div class="text-center mb-6">
+            <span class="text-[11px] font-bold text-amber-800 uppercase tracking-widest">ক্যাটাগরি সমূহ</span>
+            <h2 class="text-xl sm:text-2xl font-black font-serif-title text-stone-900 mt-0.5">
+                আপনার পছন্দের কালেকশন বেছে নিন
+            </h2>
+        </div>
+
+        <div class="flex items-center justify-start sm:justify-center gap-6 sm:gap-8 overflow-x-auto pb-4 scrollbar-none">
+            <!-- All Items Circle -->
+            <a href="{% url 'store:home' %}" class="flex flex-col items-center gap-2 group flex-shrink-0">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 border-2 {% if not selected_category %}border-stone-900 ring-2 ring-stone-900/20{% else %}border-stone-200 group-hover:border-stone-400{% endif %} transition duration-300">
+                    <div class="w-full h-full rounded-full bg-stone-900 text-white flex items-center justify-center font-bold text-xs uppercase tracking-wider shadow-inner group-hover:scale-105 transition">
+                        সব (All)
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-stone-900 group-hover:text-amber-800 transition">সব পোশাক</span>
+            </a>
+
+            <!-- Dynamic Category Circles with Photos -->
+            {% for cat in all_categories %}
+                <a href="{% url 'store:home' %}?category={{ cat.slug }}" class="flex flex-col items-center gap-2 group flex-shrink-0">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 border-2 {% if selected_category and selected_category.slug == cat.slug %}border-stone-900 ring-2 ring-stone-900/20{% else %}border-stone-200 group-hover:border-stone-400{% endif %} transition duration-300">
+                        <img 
+                            src="{{ cat.display_image }}" 
+                            alt="{{ cat.name }}" 
+                            class="w-full h-full object-cover rounded-full group-hover:scale-105 transition duration-300"
+                        >
+                    </div>
+                    <span class="text-xs font-bold text-stone-800 group-hover:text-amber-800 transition whitespace-nowrap">
+                        {{ cat.name }}
+                    </span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Value Proposition Bar -->
+<section class="border-b border-stone-200 bg-stone-50">
+    <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="flex flex-col items-center gap-1.5">
+                <span class="text-2xl">💵</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">ক্যাশ অন ডেলিভারি</span>
+                <span class="text-xs text-stone-500">পণ্য হাতে পেয়ে টাকা দিন</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5">
+                <span class="text-2xl">🌿</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">১০০% প্রিমিয়াম সুতি</span>
+                <span class="text-xs text-stone-500">আরামদায়ক ও দীর্ঘস্থায়ী ফেব্রিক</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5">
+                <span class="text-2xl">🚚</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">সারা দেশে দ্রুত ডেলিভারি</span>
+                <span class="text-xs text-stone-500">ঢাকা ২ দিন, ঢাকার বাইরে ৩ দিন</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5">
+                <span class="text-2xl">🔄</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">৭ দিনে সাইজ পরিবর্তন</span>
+                <span class="text-xs text-stone-500">সাইজ না মিললে এক্সচেঞ্জ সুবিধা</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Full-Width Main Catalog Section -->
+<section id="products-grid" class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-12">
+    
+    <!-- Title & Controls Bar -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-stone-200 mb-8">
+        <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                {% if selected_category %}ক্যাটাগরি: {{ selected_category.name }}{% elif query %}অনুসন্ধান: "{{ query }}"{% else %}সম্পূর্ণ পোশাক কালেকশন{% endif %}
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-stone-900 font-serif-title">
+                পোশাকের তালিকা ({{ total_count }}টি আইটেম)
+            </h2>
+        </div>
+
+        <!-- Sorting & Clear Filters -->
+        <div class="flex flex-wrap items-center gap-3">
+            {% if selected_category or query %}
+                <a href="{% url 'store:home' %}" class="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-3.5 py-2 rounded-lg border border-rose-200">
+                    ✕ ফিল্টার বাতিল করুন
+                </a>
+            {% endif %}
+
+            <!-- Sort By Price / Name -->
+            <form method="GET" action="{% url 'store:home' %}" class="flex items-center gap-2">
+                {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                <label for="sort" class="text-xs font-bold text-stone-600">সাজান:</label>
+                <select 
+                    id="sort" 
+                    name="sort" 
+                    onchange="this.form.submit()" 
+                    class="text-xs bg-white border border-stone-300 rounded-lg px-3.5 py-2 focus:outline-none focus:ring-1 focus:ring-stone-900 font-semibold"
+                >
+                    <option value="" {% if not sort %}selected{% endif %}>জনপ্রিয় ও নতুন</option>
+                    <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>মূল্য: কম থেকে বেশি (BDT)</option>
+                    <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>মূল্য: বেশি থেকে কম (BDT)</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>নাম অনুযায়ী (A-Z)</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Filter Pills -->
+    <div class="flex items-center gap-2.5 overflow-x-auto pb-4 mb-8 scrollbar-none text-xs">
+        <a 
+            href="{% url 'store:home' %}{% if query %}?q={{ query }}{% endif %}" 
+            class="px-5 py-2.5 rounded-full font-bold transition whitespace-nowrap {% if not selected_category %}bg-stone-900 text-white shadow-sm{% else %}bg-white text-stone-700 border border-stone-200 hover:border-stone-900{% endif %}"
+        >
+            সব পোশাক (All)
+        </a>
+        
+        {% for cat in all_categories %}
+            <a 
+                href="{% url 'store:home' %}?category={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}" 
+                class="px-5 py-2.5 rounded-full font-bold transition whitespace-nowrap {% if selected_category and selected_category.slug == cat.slug %}bg-stone-900 text-white shadow-sm{% else %}bg-white text-stone-700 border border-stone-200 hover:border-stone-900{% endif %}"
+            >
+                {{ cat.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Fluid Multi-Column Product Grid -->
+    {% if products %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 sm:gap-6">
+        {% for product in products %}
+            <div class="group bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+                <!-- Image Container -->
+                <div class="relative aspect-[3/4] bg-stone-100 overflow-hidden">
+                    <a href="{% url 'store:product_detail' product.slug %}">
+                        <img 
+                            src="{{ product.display_image }}" 
+                            alt="{{ product.name }}" 
+                            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                        >
+                    </a>
+
+                    <!-- Badge overlay -->
+                    {% if product.badge %}
+                        <span class="absolute top-2.5 left-2.5 bg-stone-900/90 text-amber-300 text-[10px] font-black px-2.5 py-1 rounded-md tracking-wider uppercase shadow">
+                            {{ product.badge }}
+                        </span>
+                    {% elif product.has_discount %}
+                        <span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md tracking-wider uppercase shadow">
+                            -{{ product.discount_percent }}% ছাড়
+                        </span>
+                    {% endif %}
+
+                    <!-- SKU Tag -->
+                    {% if product.sku %}
+                        <span class="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur text-white text-[9px] font-mono px-2 py-0.5 rounded">
+                            {{ product.sku }}
+                        </span>
+                    {% endif %}
+
+                    <!-- Quick Add Button Overlay -->
+                    <div class="absolute bottom-2.5 inset-x-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <form method="POST" action="{% url 'cart:add_to_cart' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="size" value="{{ product.size_list.0 }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full py-2 bg-stone-900 text-white text-xs font-bold rounded-lg shadow-lg hover:bg-amber-600 transition flex items-center justify-center gap-1.5">
+                                <span>🛍️ ব্যাগে যোগ করুন</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Product Information -->
+                <div class="p-4 flex flex-col flex-grow justify-between">
+                    <div>
+                        <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">
+                            {{ product.category.name }}
+                        </div>
+                        <h3 class="font-bold text-stone-900 text-xs sm:text-sm leading-snug group-hover:text-amber-800 transition line-clamp-1">
+                            <a href="{% url 'store:product_detail' product.slug %}">
+                                {{ product.name }}
+                            </a>
+                        </h3>
+                        <p class="text-stone-500 text-[11px] mt-1 line-clamp-1">
+                            {{ product.fabric_details }}
+                        </p>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-stone-100 flex items-center justify-between">
+                        <!-- Pricing in BDT -->
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-base sm:text-lg font-black text-stone-900">
+                                ৳ {{ product.current_price|floatformat:"0" }}
+                            </span>
+                            {% if product.has_discount %}
+                                <span class="text-[11px] text-stone-400 line-through">
+                                    ৳ {{ product.price|floatformat:"0" }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Available sizes -->
+                        <div class="text-[10px] text-stone-500 font-semibold">
+                            {{ product.size_list.0 }}{% if product.size_list|length > 1 %}-{{ product.size_list|last }}{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-2xl border border-stone-200 p-12 text-center max-w-lg mx-auto">
+        <span class="text-4xl">🔍</span>
+        <h3 class="text-lg font-bold text-stone-900 mt-4">কোনো পোশাক পাওয়া যায়নি</h3>
+        <p class="text-stone-500 text-xs mt-1">অন্য কোনো ক্যাটাগরি বেছে নিন অথবা নাম দিয়ে খুঁজুন।</p>
+        <div class="mt-6">
+            <a href="{% url 'store:home' %}" class="px-6 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-lg hover:bg-stone-800 transition">
+                সব পোশাক দেখুন
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</section>
+
+<!-- Festive Panjabi & Zafran Promo Banner -->
+<section class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 pb-14">
+    <div class="bg-gradient-to-r from-stone-950 via-stone-900 to-amber-950 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="space-y-3 max-w-2xl relative z-10">
+            <span class="inline-block px-3 py-1 bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-widest rounded-full border border-amber-400/30">
+                ✨ উৎসব ও ঈদ স্পেশাল
+            </span>
+            <h3 class="text-2xl sm:text-4xl font-black font-serif-title leading-tight">
+                এক্সক্লুসিভ সেমি-ফিটেড পাঞ্জাবি ও কাবলি কালেকশন
+            </h3>
+            <p class="text-stone-300 text-xs sm:text-sm leading-relaxed">
+                ১০০% কম্বড সুতি ও ফাইন সিল্ক-কটন ফেব্রিকে তৈরি প্রিমিয়াম পাঞ্জাবি। নিখুঁত প্লাকেট ও কলার ডিজাইন যা আপনাকে দেবে আভিজাত্য ও শতভাগ আরাম।
+            </p>
+        </div>
+        <div class="relative z-10 flex-shrink-0">
+            <a href="{% url 'store:home' %}?category=panjabi" class="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-stone-950 text-sm font-black rounded-xl transition shadow-lg inline-flex items-center gap-2">
+                <span>পাঞ্জাবি কালেকশন দেখুন</span>
+                <span>→</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Verified Customer Reviews & Social Proof Section -->
+<section class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-12 bg-white border-t border-stone-200">
+    <div class="text-center mb-10 max-w-2xl mx-auto">
+        <span class="text-xs font-bold uppercase tracking-widest text-amber-700">কাস্টমার মতামত</span>
+        <h2 class="text-2xl sm:text-3xl font-black font-serif-title text-stone-900 mt-1">
+            গ্রাহকদের সন্তুষ্টি আমাদের অহংকার
+        </h2>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1.5">
+            সারা বাংলাদেশ থেকে আমাদের পোশাক ক্রয়কারী সম্মানিত গ্রাহকদের মূল্যবান রিভিউ
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Review 1 -->
+        <div class="bg-stone-50 rounded-2xl p-6 border border-stone-200 space-y-3 shadow-2xs">
+            <div class="flex items-center text-amber-400 text-sm">
+                ★★★★★
+            </div>
+            <p class="text-stone-700 text-xs leading-relaxed font-medium">
+                "রয়েল নেভি ব্লু পাঞ্জাবিটি অর্ডার করেছিলাম। ২ দিনের মধ্যে ঢাকায় হোম ডেলিভারি পেয়েছি। কাপড়ের কোয়ালিটি ও ফিটিং অসাধারণ হয়েছে!"
+            </p>
+            <div class="pt-2 border-t border-stone-200/80 flex items-center justify-between text-xs">
+                <div>
+                    <strong class="text-stone-900 block">মোঃ তানভীর আহমেদ</strong>
+                    <span class="text-stone-400 text-[11px]">ধানমন্ডি, ঢাকা</span>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">✓ ভেরিফাইড বায়ার</span>
+            </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="bg-stone-50 rounded-2xl p-6 border border-stone-200 space-y-3 shadow-2xs">
+            <div class="flex items-center text-amber-400 text-sm">
+                ★★★★★
+            </div>
+            <p class="text-stone-700 text-xs leading-relaxed font-medium">
+                "লিনেন শার্টের ফেব্রিক সত্যিই অসাধারণ নরম। গরমের জন্য পারফেক্ট। সাইজ নিয়ে একটু দ্বিধা ছিল, সাইজ চার্ট দেখে অর্ডার করায় একদম পারফেক্ট মিলেছে।"
+            </p>
+            <div class="pt-2 border-t border-stone-200/80 flex items-center justify-between text-xs">
+                <div>
+                    <strong class="text-stone-900 block">আসিফ মাহমুদ</strong>
+                    <span class="text-stone-400 text-[11px]">জিইসি, চট্টগ্রাম</span>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">✓ ভেরিফাইড বায়ার</span>
+            </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="bg-stone-50 rounded-2xl p-6 border border-stone-200 space-y-3 shadow-2xs">
+            <div class="flex items-center text-amber-400 text-sm">
+                ★★★★★
+            </div>
+            <p class="text-stone-700 text-xs leading-relaxed font-medium">
+                "ক্যাশ অন ডেলিভারিতে সুন্দরবন কুরিয়ারে পেয়েছি। প্যাকেজিং খুবই প্রিমিয়াম ছিল। ড্রপ শোল্ডার টি-শার্টের কলার অনেক ওয়াশের পরেও নষ্ট হয় না।"
+            </p>
+            <div class="pt-2 border-t border-stone-200/80 flex items-center justify-between text-xs">
+                <div>
+                    <strong class="text-stone-900 block">সাকিব আল হাসান</strong>
+                    <span class="text-stone-400 text-[11px]">উপশহর, সিলেট</span>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">✓ ভেরিফাইড বায়ার</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

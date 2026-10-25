@@ -1,0 +1,23 @@
+/* Weaverel Custom CSS Enhancements */
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbars for horizontal pills */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Card hover animation */
+.clothing-card-hover {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.clothing-card-hover:hover {
+    transform: translateY(-4px);
+}

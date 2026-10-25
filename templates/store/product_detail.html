@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | Weaverel Apparel (BDT ৳){% endblock %}
+
+{% block content %}
+<div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-8">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs text-stone-500 mb-6">
+        <a href="{% url 'store:home' %}" class="hover:text-stone-900 transition font-medium">হোম</a>
+        <span>/</span>
+        <a href="{% url 'store:home' %}?category={{ product.category.slug }}" class="hover:text-stone-900 transition font-medium">
+            {{ product.category.name }}
+        </a>
+        <span>/</span>
+        <span class="text-stone-900 font-bold truncate">{{ product.name }}</span>
+    </nav>
+
+    <!-- Product Details Layout (Full-Width Responsive 2 Columns) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        
+        <!-- Left: Product Image Gallery (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+            <div class="relative aspect-[4/5] bg-stone-100 rounded-3xl overflow-hidden border border-stone-200 shadow-sm">
+                <img 
+                    src="{{ product.display_image }}" 
+                    alt="{{ product.name }}" 
+                    class="w-full h-full object-cover object-center"
+                >
+                {% if product.badge %}
+                    <span class="absolute top-4 left-4 bg-stone-900 text-amber-300 text-xs font-black px-3.5 py-1.5 rounded-lg tracking-wider uppercase shadow">
+                        {{ product.badge }}
+                    </span>
+                {% elif product.has_discount %}
+                    <span class="absolute top-4 left-4 bg-rose-600 text-white text-xs font-black px-3 py-1 rounded-lg tracking-wider uppercase shadow">
+                        -{{ product.discount_percent }}% ছাড়
+                    </span>
+                {% endif %}
+
+                {% if product.sku %}
+                    <span class="absolute bottom-4 right-4 bg-black/70 backdrop-blur text-white text-xs font-mono px-3 py-1 rounded-md">
+                        কোড: {{ product.sku }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Guarantee Badges -->
+            <div class="grid grid-cols-3 gap-3 text-xs text-stone-700">
+                <div class="p-3.5 bg-white rounded-2xl border border-stone-200 flex flex-col items-center text-center gap-1 shadow-xs">
+                    <span class="text-xl">💵</span>
+                    <strong class="text-stone-900">ক্যাশ অন ডেলিভারি</strong>
+                    <span class="text-stone-500 text-[11px]">পণ্য দেখে টাকা দিন</span>
+                </div>
+                <div class="p-3.5 bg-white rounded-2xl border border-stone-200 flex flex-col items-center text-center gap-1 shadow-xs">
+                    <span class="text-xl">🌿</span>
+                    <strong class="text-stone-900">১০০% খাঁটি ফেব্রিক</strong>
+                    <span class="text-stone-500 text-[11px]">প্রিমিয়াম কম্বড সুতি</span>
+                </div>
+                <div class="p-3.5 bg-white rounded-2xl border border-stone-200 flex flex-col items-center text-center gap-1 shadow-xs">
+                    <span class="text-xl">🔄</span>
+                    <strong class="text-stone-900">৭ দিনে এক্সচেঞ্জ</strong>
+                    <span class="text-stone-500 text-[11px]">সহজ সাইজ পরিবর্তন</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Purchase Form & Details (5 Cols) -->
+        <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-700">
+                    {{ product.category.name }}
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-stone-900 font-serif-title mt-1 leading-snug">
+                    {{ product.name }}
+                </h1>
+                
+                <!-- BDT Pricing -->
+                <div class="flex items-baseline gap-3 mt-3">
+                    <span class="text-3xl font-black text-stone-900">
+                        ৳ {{ product.current_price|floatformat:"0" }}
+                    </span>
+                    {% if product.has_discount %}
+                        <span class="text-lg text-stone-400 line-through">
+                            ৳ {{ product.price|floatformat:"0" }}
+                        </span>
+                        <span class="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-200">
+                            {{ product.discount_percent }}% সাশ্রয়
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Fabric Specification -->
+            <div class="p-4 bg-amber-50/60 rounded-2xl border border-amber-200/80 text-xs text-stone-700 space-y-1">
+                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                    <span>🌿</span> কাপড়ের বিবরণ (Fabric Spec):
+                </div>
+                <div class="font-medium">{{ product.fabric_details }}</div>
+            </div>
+
+            <!-- Product Description -->
+            <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">পোশাকের বিবরণ</h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    {{ product.description }}
+                </p>
+            </div>
+
+            <!-- Order Form -->
+            <form id="product-order-form" method="POST" action="{% url 'cart:add_to_cart' product.id %}" class="space-y-6 border-t border-stone-200 pt-6">
+                {% csrf_token %}
+
+                <!-- Color -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
+                        রং (Color): <span class="font-semibold text-stone-900">{{ product.color }}</span>
+                    </label>
+                </div>
+
+                <!-- Sizes + Size Chart Trigger -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-stone-700">
+                            সাইজ নির্বাচন করুন (Select Size)
+                        </label>
+                        <!-- Interactive Size Chart Modal Button -->
+                        <button 
+                            type="button" 
+                            onclick="document.getElementById('size-modal').classList.remove('hidden')" 
+                            class="text-xs font-bold text-amber-800 hover:text-amber-900 underline flex items-center gap-1"
+                        >
+                            <span>📏 সাইজ চার্ট দেখুন</span>
+                        </button>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2.5">
+                        {% for size in product.size_list %}
+                            <label class="cursor-pointer">
+                                <input 
+                                    type="radio" 
+                                    name="size" 
+                                    value="{{ size }}" 
+                                    {% if forloop.first %}checked{% endif %} 
+                                    class="peer sr-only"
+                                >
+                                <div class="px-5 py-2.5 rounded-xl border border-stone-300 text-xs font-bold text-stone-700 peer-checked:bg-stone-900 peer-checked:text-white peer-checked:border-stone-900 hover:border-stone-600 transition min-w-[52px] text-center shadow-2xs">
+                                    {{ size }}
+                                </div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <div class="text-[11px] text-stone-400 mt-2">
+                        স্টক: <strong class="text-amber-700">{{ product.stock }} পিস রয়েছে</strong> (সীমিত স্টক)
+                    </div>
+                </div>
+
+                <!-- Quantity & Purchase Buttons -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center gap-4">
+                        <div class="w-24">
+                            <label for="quantity" class="text-xs font-bold text-stone-700 mb-1 block">পরিমাণ (Qty)</label>
+                            <select id="quantity" name="quantity" class="w-full bg-white border border-stone-300 rounded-xl py-3 px-3 text-sm font-bold focus:ring-1 focus:ring-stone-900">
+                                <option value="1">১টি</option>
+                                <option value="2">২টি</option>
+                                <option value="3">৩টি</option>
+                                <option value="4">৪টি</option>
+                                <option value="5">৫টি</option>
+                            </select>
+                        </div>
+
+                        <!-- Standard Cart Button -->
+                        <div class="flex-grow pt-5">
+                            <button 
+                                type="submit" 
+                                class="w-full py-3.5 px-6 bg-stone-900 hover:bg-stone-800 text-white text-sm font-black rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                            >
+                                <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                <span>অর্ডার করুন (ব্যাগে যোগ করুন)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1-Click WhatsApp Direct Order Button -->
+                    <a 
+                        href="https://wa.me/8801700000000?text=আসসালামু%20আলাইকুম,%20আমি%20Weaverel%20থেকে%20{{ product.name|urlencode }}%20(মূল্য:%20৳%20{{ product.current_price|floatformat:"0" }})%20অর্ডার%20করতে%20চাই।" 
+                        target="_blank"
+                        class="w-full py-3.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-black rounded-xl shadow-md transition flex items-center justify-center gap-2"
+                    >
+                        <span>💬 WhatsApp এ দ্রুত অর্ডার করুন</span>
+                    </a>
+                </div>
+            </form>
+
+            <!-- Delivery Information -->
+            <div class="border-t border-stone-200 pt-5 space-y-2 text-xs text-stone-600">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-stone-800">🚚 ডেলিভারি চার্জ:</span>
+                    <span>ঢাকা মেট্রো ৳ ৭০ | সাব-এরিয়া ৳ ১০০ | ঢাকার বাইরে ৳ ১৩০</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-stone-800">🎉 ফ্রি ডেলিভারি:</span>
+                    <span class="text-emerald-700 font-bold">৳ ২,৫০০ এর বেশি অর্ডারে চার্জ ফ্রি</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-stone-800">⏱️ ডেলিভারি সময়:</span>
+                    <span>ঢাকা সিটিতে ২৪-৪৮ ঘণ্টা, ঢাকার বাইরে ২-৩ দিন</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-Width Related Products -->
+    {% if related_products %}
+    <div class="mt-20 pt-10 border-t border-stone-200">
+        <h2 class="text-2xl font-bold font-serif-title text-stone-900 mb-6">
+            একই ক্যাটাগরির আরও পোশাক
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {% for item in related_products %}
+                <div class="group bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-lg transition">
+                    <a href="{% url 'store:product_detail' item.slug %}">
+                        <div class="aspect-[3/4] bg-stone-100 overflow-hidden">
+                            <img src="{{ item.display_image }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </div>
+                    </a>
+                    <div class="p-4">
+                        <h3 class="text-xs font-bold text-stone-900 truncate">
+                            <a href="{% url 'store:product_detail' item.slug %}">{{ item.name }}</a>
+                        </h3>
+                        <div class="text-sm font-black text-stone-900 mt-1">
+                            ৳ {{ item.current_price|floatformat:"0" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Interactive Size Guide Modal (সাইজ চার্ট) -->
+<div id="size-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-5 animate-scaleIn">
+        <!-- Close Button -->
+        <button 
+            type="button" 
+            onclick="document.getElementById('size-modal').classList.add('hidden')"
+            class="absolute top-5 right-5 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold flex items-center justify-center transition"
+        >
+            ✕
+        </button>
+
+        <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-700">সাইজ গাইড</span>
+            <h3 class="text-xl sm:text-2xl font-black font-serif-title text-stone-900 mt-0.5">
+                পরিমাপ ও সাইজ চার্ট (Size Chart)
+            </h3>
+            <p class="text-xs text-stone-500 mt-1">
+                সব পরিমাপ ইঞ্চিতে (Inches) দেওয়া হলো। আপনার শারীরিক মাপ অনুযায়ী সাইজ বেছে নিন।
+            </p>
+        </div>
+
+        <!-- Panjabi Size Table -->
+        <div class="space-y-2">
+            <h4 class="text-xs font-bold text-stone-900 uppercase">পাঞ্জাবি মেজারমেন্ট চার্ট (Panjabi):</h4>
+            <div class="overflow-x-auto rounded-xl border border-stone-200">
+                <table class="w-full text-xs text-left divide-y divide-stone-200">
+                    <thead class="bg-stone-100 text-stone-700 font-bold">
+                        <tr>
+                            <th class="p-2.5">সাইজ (Size)</th>
+                            <th class="p-2.5">বুকের মাপ (Chest)</th>
+                            <th class="p-2.5">লম্বা (Length)</th>
+                            <th class="p-2.5">কাঁধ (Shoulder)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100 text-stone-800">
+                        <tr><td class="p-2.5 font-bold">৩৮ (38)</td><td class="p-2.5">৪০"</td><td class="p-2.5">৪০"</td><td class="p-2.5">১৭.৫"</td></tr>
+                        <tr><td class="p-2.5 font-bold">৪০ (40)</td><td class="p-2.5">৪২"</td><td class="p-2.5">৪২"</td><td class="p-2.5">১৮"</td></tr>
+                        <tr><td class="p-2.5 font-bold">৪২ (42)</td><td class="p-2.5">৪৪"</td><td class="p-2.5">৪৪"</td><td class="p-2.5">১৮.৫"</td></tr>
+                        <tr><td class="p-2.5 font-bold">৪৪ (44)</td><td class="p-2.5">৪৬"</td><td class="p-2.5">৪৫"</td><td class="p-2.5">১৯"</td></tr>
+                        <tr><td class="p-2.5 font-bold">৪৬ (46)</td><td class="p-2.5">৪৮"</td><td class="p-2.5">৪৬"</td><td class="p-2.5">১৯.৫"</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Shirts / T-Shirts Size Table -->
+        <div class="space-y-2 pt-2 border-t border-stone-100">
+            <h4 class="text-xs font-bold text-stone-900 uppercase">শার্ট ও টি-শার্ট মেজারমেন্ট (Shirts/Tees):</h4>
+            <div class="overflow-x-auto rounded-xl border border-stone-200">
+                <table class="w-full text-xs text-left divide-y divide-stone-200">
+                    <thead class="bg-stone-100 text-stone-700 font-bold">
+                        <tr>
+                            <th class="p-2.5">সাইজ</th>
+                            <th class="p-2.5">বুকের মাপ (Chest)</th>
+                            <th class="p-2.5">লম্বা (Length)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100 text-stone-800">
+                        <tr><td class="p-2.5 font-bold">M</td><td class="p-2.5">৩৯"</td><td class="p-2.5">২৮"</td></tr>
+                        <tr><td class="p-2.5 font-bold">L</td><td class="p-2.5">৪১"</td><td class="p-2.5">২৯"</td></tr>
+                        <tr><td class="p-2.5 font-bold">XL</td><td class="p-2.5">৪৩"</td><td class="p-2.5">৩০"</td></tr>
+                        <tr><td class="p-2.5 font-bold">XXL</td><td class="p-2.5">৪৫"</td><td class="p-2.5">৩১"</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button 
+            type="button" 
+            onclick="document.getElementById('size-modal').classList.add('hidden')"
+            class="w-full py-3 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition"
+        >
+            বুঝেছি, সাইজ সিলেক্ট করুন ✓
+        </button>
+    </div>
+</div>
+
+<!-- Mobile Sticky Bottom Buy Bar (Frictionless Mobile Checkout) -->
+<div class="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-stone-200 p-3 z-40 flex items-center justify-between gap-3 shadow-2xl">
+    <div>
+        <span class="text-[10px] text-stone-500 uppercase font-bold block">মোট মূল্য</span>
+        <span class="text-lg font-black text-stone-900">৳ {{ product.current_price|floatformat:"0" }}</span>
+    </div>
+    <div class="flex items-center gap-2">
+        <a 
+            href="https://wa.me/8801700000000?text=আসসালামু%20আলাইকুম,%20আমি%20{{ product.name|urlencode }}%20অর্ডার%20করতে%20চাই।" 
+            target="_blank"
+            class="p-2.5 bg-emerald-600 text-white rounded-xl font-bold text-xs"
+            title="WhatsApp Order"
+        >
+            💬
+        </a>
+        <button 
+            type="button" 
+            onclick="document.getElementById('product-order-form').submit()"
+            class="px-6 py-2.5 bg-stone-900 text-white rounded-xl text-xs font-black shadow"
+        >
+            অর্ডার করুন →
+        </button>
+    </div>
+</div>
+{% endblock %}

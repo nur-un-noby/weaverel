@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}অর্ডার সফল হয়েছে! | Weaverel Clothing{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-4xl mx-auto px-4 sm:px-8 py-12 text-center">
+    
+    <!-- Success Icon & Header -->
+    <div class="w-16 h-16 bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-xs">
+        ✓
+    </div>
+
+    <span class="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-300 inline-block">
+        অর্ডারটি সফলভাবে সম্পন্ন হয়েছে
+    </span>
+
+    <h1 class="text-3xl sm:text-4xl font-black font-serif-title text-stone-900 mt-3">
+        ধন্যবাদ! আপনার অর্ডারটি আমরা গ্রহণ করেছি
+    </h1>
+    <p class="text-stone-600 text-xs sm:text-sm mt-2">
+        অর্ডার ট্র্যাকিং নম্বর: <strong class="bg-stone-100 px-3 py-1 rounded-lg text-stone-900 font-mono text-sm border border-stone-200">#{{ order.order_number }}</strong>
+    </p>
+
+    <!-- Invoice Details Card -->
+    <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-9 my-8 text-left space-y-6 shadow-sm">
+        
+        <!-- Customer & Delivery Summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-6 border-b border-stone-100 text-xs">
+            <div>
+                <span class="text-stone-400 font-bold uppercase block mb-1">গ্রাহকের বিবরণ:</span>
+                <div class="font-bold text-stone-900 text-sm">{{ order.full_name }}</div>
+                <div class="text-stone-700 mt-1 font-medium">📞 {{ order.phone_number }}</div>
+                {% if order.alternative_phone %}
+                    <div class="text-stone-500 mt-0.5">বিকল্প নম্বর: {{ order.alternative_phone }}</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <span class="text-stone-400 font-bold uppercase block mb-1">ডেলিভারির ঠিকানা:</span>
+                <div class="text-stone-900 font-medium leading-relaxed">{{ order.address }}</div>
+                <div class="mt-1 font-bold text-amber-800">
+                    {{ order.get_delivery_zone_display }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Ordered Items Table -->
+        <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">
+                অর্ডারের পোশাক তালিকা ({{ items|length }}টি আইটেম)
+            </h3>
+            
+            <div class="divide-y divide-stone-100 border-y border-stone-100">
+                {% for item in items %}
+                    <div class="py-3.5 flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-bold text-stone-900 block text-sm">{{ item.product_name }}</span>
+                            <span class="text-stone-500">সাইজ: <strong class="text-stone-700">{{ item.size }}</strong> | পরিমাণ: {{ item.quantity }}টি</span>
+                        </div>
+                        <span class="font-black text-stone-900 text-sm">৳ {{ item.total_price|floatformat:"0" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="space-y-2 pt-2 text-xs text-stone-600">
+            <div class="flex justify-between">
+                <span>পোশাকের মূল্য (Subtotal):</span>
+                <span class="font-bold text-stone-900">{{ subtotal_bdt }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>ডেলিভারি চার্জ:</span>
+                <span class="font-bold text-stone-900">{{ delivery_charge_bdt }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>পেমেন্ট পদ্ধতি:</span>
+                <span class="font-bold text-emerald-800">{{ order.get_payment_method_display }}</span>
+            </div>
+            <div class="flex justify-between text-base font-black text-stone-900 border-t border-stone-200 pt-3">
+                <span>সর্বমোট পরিশোধযোগ্য (Total):</span>
+                <span class="text-amber-800 text-xl font-black">{{ total_amount_bdt }}</span>
+            </div>
+        </div>
+
+        <!-- Delivery Notice -->
+        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 leading-relaxed flex items-start gap-3">
+            <span class="text-xl">📦</span>
+            <div>
+                <strong>ডেলিভারি সংক্রান্ত তথ্য:</strong> আমাদের প্রতিনিধি পার্সেল পাঠানোর পূর্বে আপনাকে ফোনে নিশ্চিত করতে পারেন। ঢাকা সিটিতে ২৪-৪৮ ঘণ্টার মধ্যে এবং ঢাকার বাইরে ২-৩ দিনের মধ্যে আপনার ঠিকানায় হোম ডেলিভারি পৌঁছে যাবে।
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap justify-center gap-3.5">
+        <a href="{% url 'store:home' %}" class="px-8 py-3.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition shadow">
+            ← আরও কেনাকাটা করুন
+        </a>
+        <button onclick="window.print()" class="px-6 py-3.5 bg-white border border-stone-300 text-stone-800 text-xs font-bold rounded-xl hover:bg-stone-100 transition flex items-center gap-1.5">
+            <span>🖨️ ইনভয়েস প্রিন্ট করুন</span>
+        </button>
+        <a 
+            href="https://wa.me/8801700000000?text=আসসালামু%20আলাইকুম,%20আমার%20অর্ডার%20নম্বর%20%23{{ order.order_number }}%20(মোট:%20{{ total_amount_bdt }})।" 
+            target="_blank"
+            class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5"
+        >
+            <span>💬 WhatsApp এ কনফার্ম করুন</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}

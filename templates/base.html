@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Weaverel | প্রিমিয়াম পাঞ্জাবি, শার্ট ও টি-শার্ট কালেকশন (BDT ৳){% endblock %}</title>
+    <!-- Tailwind CSS CDN for fluid responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdfbf7',
+                            100: '#f7f2ea',
+                            500: '#8c6b4f',
+                            900: '#1c1917',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Hind Siliguri', 'Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        body { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-[#FBFBFA] text-stone-900 min-h-screen flex flex-col selection:bg-stone-900 selection:text-white">
+
+    <!-- Top Announcement Bar (Full Width & Customer-Centric) -->
+    <aside aria-label="Announcement" class="bg-stone-950 text-stone-300 text-xs py-2 px-4 sm:px-8 lg:px-12 border-b border-stone-800">
+        <div class="w-full flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>🚚 <strong>সারাদেশে ক্যাশ অন ডেলিভারি</strong> | <strong>৳ ২,৫০০+</strong> অর্ডারে ডেলিভারি চার্জ ফ্রি!</span>
+            </div>
+            <div class="flex items-center gap-5 text-xs text-stone-400">
+                <a href="{% url 'store:track_order' %}" class="hover:text-amber-300 font-semibold transition flex items-center gap-1 text-stone-300">
+                    <span>📦 অর্ডার ট্র্যাক করুন</span>
+                </a>
+                <span class="text-stone-700">|</span>
+                <a href="tel:01700000000" class="hover:text-white font-bold text-amber-300 flex items-center gap-1">
+                    <span>📞 01700-000000</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Navigation Bar (Full Width Fluid) -->
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200 shadow-xs">
+        <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'store:home' %}" class="flex items-center gap-2.5 group">
+                        <span class="w-9 h-9 bg-stone-900 text-white rounded-lg flex items-center justify-center font-bold text-lg group-hover:bg-amber-600 transition shadow-sm">W</span>
+                        <div class="flex flex-col">
+                            <span class="text-2xl font-black tracking-wider uppercase font-serif-title leading-tight text-stone-900">WEAVEREL</span>
+                            <span class="text-[10px] tracking-widest uppercase text-stone-500 font-bold">উইভারেল অ্যাপারেল</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Dynamic Categories from Database (Admin Configurable) -->
+                <nav class="hidden lg:flex items-center gap-7 text-sm font-bold text-stone-700">
+                    <a href="{% url 'store:home' %}" class="hover:text-amber-800 transition">সব কালেকশন</a>
+                    
+                    {% for cat in all_categories %}
+                        <a href="{% url 'store:home' %}?category={{ cat.slug }}" class="hover:text-amber-800 transition whitespace-nowrap">
+                            {{ cat.name }}
+                        </a>
+                    {% endfor %}
+
+                    <a href="{% url 'store:track_order' %}" class="text-amber-800 hover:text-stone-900 flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 transition">
+                        <span>📦 ট্র্যাক করুন</span>
+                    </a>
+                </nav>
+
+                <!-- Search & Shopping Bag -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Search Form -->
+                    <form method="GET" action="{% url 'store:home' %}" class="relative flex items-center">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ query|default:'' }}" 
+                            placeholder="পাঞ্জাবি, শার্ট বা টি-শার্ট খুঁজুন..." 
+                            class="pl-9 pr-4 py-2 text-xs bg-stone-100 rounded-full border border-stone-200 focus:outline-none focus:ring-1 focus:ring-stone-900 w-36 sm:w-60 focus:w-72 transition-all font-medium"
+                        >
+                        <svg class="w-4 h-4 text-stone-400 absolute left-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </form>
+
+                    <!-- Shopping Bag Button -->
+                    <a href="{% url 'cart:cart_detail' %}" class="relative px-4 py-2.5 bg-stone-900 text-white rounded-xl hover:bg-stone-800 transition flex items-center gap-2 shadow-sm group">
+                        <svg class="w-5 h-5 text-amber-300 group-hover:scale-105 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        <span class="text-xs font-bold hidden sm:inline">শপিং ব্যাগ</span>
+                        {% if cart_total_items > 0 %}
+                            <span class="bg-amber-400 text-stone-950 text-xs font-black px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                                {{ cart_total_items }}
+                            </span>
+                        {% else %}
+                            <span class="text-xs text-stone-400 hidden sm:inline">(০)</span>
+                        {% endif %}
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Mobile Dynamic Categories Bar -->
+        <div class="lg:hidden bg-stone-50 border-t border-stone-200 px-4 py-2.5 flex items-center gap-4 overflow-x-auto scrollbar-none text-xs font-bold text-stone-700">
+            <a href="{% url 'store:home' %}" class="whitespace-nowrap hover:text-stone-900">সব</a>
+            {% for cat in all_categories %}
+                <a href="{% url 'store:home' %}?category={{ cat.slug }}" class="whitespace-nowrap hover:text-amber-800">
+                    {{ cat.name }}
+                </a>
+            {% endfor %}
+            <a href="{% url 'store:track_order' %}" class="whitespace-nowrap text-amber-800 font-bold">📦 ট্র্যাক করুন</a>
+        </div>
+    </header>
+
+    <!-- Flash Messages (Notifications) -->
+    {% if messages %}
+    <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 mt-4">
+        {% for message in messages %}
+            <div class="flex items-center justify-between p-4 mb-2 text-sm rounded-xl border shadow-sm
+                {% if message.tags == 'success' %} bg-emerald-50 text-emerald-900 border-emerald-300 
+                {% elif message.tags == 'warning' %} bg-amber-50 text-amber-900 border-amber-300 
+                {% elif message.tags == 'error' %} bg-rose-50 text-rose-900 border-rose-300 
+                {% else %} bg-stone-100 text-stone-800 border-stone-300 {% endif %}">
+                <div class="flex items-center gap-3 font-semibold">
+                    <span class="text-xl">
+                        {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}⚠{% else %}ℹ{% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-xs font-bold opacity-75 hover:opacity-100">✕ বন্ধ করুন</button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content (Full Width) -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating WhatsApp Support Button (24/7 Live Assistance) -->
+    <aside aria-label="Support chat" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+        <span class="hidden group-hover:inline-block bg-stone-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg transition">
+            WhatsApp এ মেসেজ দিন
+        </span>
+        <a 
+            href="https://wa.me/8801700000000?text=আসসালামু%20আলাইকুম,%20Weaverel%20থেকে%20পণ্য%20সম্পর্কে%20জানতে%20চাই।" 
+            target="_blank" 
+            class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition duration-300 relative"
+            title="Chat on WhatsApp"
+        >
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white animate-ping"></span>
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white"></span>
+            <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+            </svg>
+        </a>
+    </aside>
+
+    <!-- Retail Footer (Full Width with Payment & Delivery Partners) -->
+    <footer class="bg-stone-950 text-stone-300 pt-16 pb-10 mt-20 border-t border-stone-800">
+        <div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-stone-800 text-sm">
+                
+                <!-- Col 1: Brand Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 bg-white text-stone-900 rounded-lg flex items-center justify-center font-bold text-sm">W</span>
+                        <span class="text-xl font-bold tracking-wider uppercase text-white font-serif-title">WEAVEREL</span>
+                    </div>
+                    <p class="text-stone-400 text-xs leading-relaxed max-w-sm">
+                        উইভারেল — খাঁটি কটন, প্রিমিয়াম পাঞ্জাবি, ক্যাজুয়াল শার্ট ও আরামদায়ক টি-শার্টের নির্ভরযোগ্য ব্র্যান্ড। আধুনিক ফিটিং ও দীর্ঘস্থায়ী কোয়ালিটি নিয়ে আমরা অঙ্গীকারবদ্ধ।
+                    </p>
+                    <div class="text-xs space-y-1.5 pt-1">
+                        <div class="text-amber-300 font-bold">📞 হটলাইন: 01700-000000</div>
+                        <div class="text-emerald-400 font-bold">💬 WhatsApp: 01700-000000</div>
+                        <div class="text-stone-500 text-[11px]">ঢাকা, বাংলাদেশ (সকাল ৯টা - রাত ১০টা)</div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Dynamic Categories -->
+                <div>
+                    <h3 class="text-white text-xs font-bold tracking-wider uppercase mb-4 text-stone-200">জনপ্রিয় ক্যাটাগরি</h3>
+                    <ul class="space-y-2.5 text-xs text-stone-400">
+                        <li><a href="{% url 'store:home' %}" class="hover:text-white transition font-medium">সব পোশাক (All Collection)</a></li>
+                        {% for cat in all_categories %}
+                            <li>
+                                <a href="{% url 'store:home' %}?category={{ cat.slug }}" class="hover:text-white transition">
+                                    {{ cat.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Col 3: Customer Assurance -->
+                <div>
+                    <h3 class="text-white text-xs font-bold tracking-wider uppercase mb-4 text-stone-200">আমাদের সার্ভিস ও সুবিধা</h3>
+                    <ul class="space-y-2.5 text-xs text-stone-400">
+                        <li class="flex items-center gap-2"><span>✓</span> <span>পণ্য হাতে পেয়ে মূল্য পরিশোধ (ক্যাশ অন ডেলিভারি)</span></li>
+                        <li class="flex items-center gap-2"><span>✓</span> <span>১০০% খাঁটি সুতি ও প্রিমিয়াম ফেব্রিক গ্যারান্টি</span></li>
+                        <li class="flex items-center gap-2"><span>✓</span> <span>৭ দিনের সহজ সাইজ পরিবর্তন (Exchange) সুবিধা</span></li>
+                        <li class="flex items-center gap-2"><span>✓</span> <span>ঢাকা সিটিতে ২৪-৪৮ ঘণ্টায় ফাস্ট ডেলিভারি</span></li>
+                        <li class="flex items-center gap-2"><span>✓</span> <span>সমগ্র বাংলাদেশে ২-৩ দিনে হোম ডেলিভারি</span></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Trust & Payment Partners -->
+                <div>
+                    <h3 class="text-white text-xs font-bold tracking-wider uppercase mb-4 text-stone-200">নিরাপদ পেমেন্ট ও ডেলিভারি</h3>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800 space-y-2">
+                            <span class="text-[11px] font-bold text-stone-300 block">পেমেন্ট মেথড:</span>
+                            <div class="flex flex-wrap gap-2 text-[10px] font-bold">
+                                <span class="bg-stone-800 text-amber-300 px-2 py-1 rounded">💵 ক্যাশ অন ডেলিভারি</span>
+                                <span class="bg-pink-900/60 text-pink-200 px-2 py-1 rounded">বিকাশ (bKash)</span>
+                                <span class="bg-amber-900/60 text-amber-200 px-2 py-1 rounded">নগদ (Nagad)</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800 space-y-2">
+                            <span class="text-[11px] font-bold text-stone-300 block">ডেলিভারি পার্টনার:</span>
+                            <div class="flex flex-wrap gap-1.5 text-[10px] text-stone-400">
+                                <span class="bg-stone-800 px-2 py-0.5 rounded">রেডএক্স</span>
+                                <span class="bg-stone-800 px-2 py-0.5 rounded">পাঠাও</span>
+                                <span class="bg-stone-800 px-2 py-0.5 rounded">স্টেডফাস্ট</span>
+                                <span class="bg-stone-800 px-2 py-0.5 rounded">সুন্দরবন</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <a href="{% url 'store:track_order' %}" class="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-bold underline">
+                                <span>📦 আপনার পার্সেল ট্র্যাক করুন →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright & Staff Link -->
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-stone-500 gap-4">
+                <p>© 2026 Weaverel Apparel (উইভারেল). সর্বস্বত্ব সংরক্ষিত। সমস্ত মূল্য বাংলাদেশি টাকা (BDT ৳)।</p>
+                <div class="flex items-center gap-4 text-stone-500 text-[11px]">
+                    <a href="{% url 'store:home' %}" class="hover:text-stone-300">হোম</a>
+                    <span>•</span>
+                    <a href="{% url 'store:track_order' %}" class="hover:text-stone-300">ট্র্যাক অর্ডার</a>
+                    <span>•</span>
+                    <a href="{% url 'cart:cart_detail' %}" class="hover:text-stone-300">শপিং ব্যাগ ({{ cart_total_items }})</a>
+                    <span>•</span>
+                    <a href="/admin/" target="_blank" class="hover:text-stone-400 opacity-60 hover:opacity-100 transition">স্টাফ লগইন</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

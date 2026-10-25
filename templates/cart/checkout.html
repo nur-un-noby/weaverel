@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}অর্ডার সম্পন্ন করুন (Checkout) | Weaverel{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 2xl:px-16 py-8">
+    <div class="pb-6 border-b border-stone-200 mb-8">
+        <h1 class="text-2xl sm:text-3xl font-black font-serif-title text-stone-900">
+            অর্ডার তথ্য প্রদান করুন (Checkout)
+        </h1>
+        <p class="text-xs text-stone-500 mt-1">
+            পণ্য ডেলিভারির জন্য আপনার নাম, মোবাইল নম্বর এবং সম্পূর্ণ ঠিকানা সঠিকভাবে লিখুন
+        </p>
+    </div>
+
+    <form method="POST" action="{% url 'cart:checkout' %}">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left: Delivery Information Form (8 Cols) -->
+            <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+                
+                <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 border-b border-stone-100 pb-3">
+                    <span>📍</span> ১. ডেলিভারি ঠিকানা (Delivery Address)
+                </h2>
+
+                <!-- Customer Name -->
+                <div>
+                    <label for="full_name" class="block text-xs font-bold text-stone-700 mb-1.5">
+                        আপনার পুরো নাম (Full Name) <span class="text-rose-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="full_name" 
+                        name="full_name" 
+                        required 
+                        placeholder="যেমন: মোঃ রফিকুল ইসলাম" 
+                        class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-900 font-medium"
+                    >
+                </div>
+
+                <!-- Phone Numbers -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="phone_number" class="block text-xs font-bold text-stone-700 mb-1.5">
+                            সচল মোবাইল নম্বর (Mobile Number) <span class="text-rose-500">*</span>
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="phone_number" 
+                            name="phone_number" 
+                            required 
+                            placeholder="01XXXXXXXXX" 
+                            class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-900 font-medium"
+                        >
+                        <span class="text-[10px] text-stone-400 mt-1 block">ডেলিভারি ম্যান এই নম্বরে যোগাযোগ করবেন</span>
+                    </div>
+
+                    <div>
+                        <label for="alternative_phone" class="block text-xs font-bold text-stone-700 mb-1.5">
+                            বিকল্প মোবাইল নম্বর (ঐচ্ছিক)
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="alternative_phone" 
+                            name="alternative_phone" 
+                            placeholder="01XXXXXXXXX" 
+                            class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-900 font-medium"
+                        >
+                    </div>
+                </div>
+
+                <!-- Full Address -->
+                <div>
+                    <label for="address" class="block text-xs font-bold text-stone-700 mb-1.5">
+                        সম্পূর্ণ ডেলিভারি ঠিকানা (Full Address) <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea 
+                        id="address" 
+                        name="address" 
+                        rows="2" 
+                        required 
+                        placeholder="বাসা নং, রোড নং, এলাকা/গ্রাম, থানা এবং জেলার নাম স্পষ্টভাবে লিখুন..." 
+                        class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-900 font-medium"
+                    ></textarea>
+                </div>
+
+                <!-- Delivery Zone Radio Buttons -->
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-2">
+                        ডেলিভারি এলাকা নির্বাচন করুন (Delivery Zone)
+                    </label>
+                    
+                    <div class="space-y-2.5">
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-stone-300 cursor-pointer hover:bg-stone-50 transition">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="delivery_zone" value="DHAKA" checked class="text-stone-900 focus:ring-0">
+                                <div class="text-xs">
+                                    <span class="font-bold text-stone-900 block">ঢাকা মেট্রো (Inside Dhaka)</span>
+                                    <span class="text-stone-500">২৪ থেকে ৪৮ ঘণ্টায় ডেলিভারি</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black text-stone-900">
+                                {% if free_delivery %}ফ্রি (Free){% else %}৳ ৭০{% endif %}
+                            </span>
+                        </label>
+
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-stone-300 cursor-pointer hover:bg-stone-50 transition">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="delivery_zone" value="SUBURB" class="text-stone-900 focus:ring-0">
+                                <div class="text-xs">
+                                    <span class="font-bold text-stone-900 block">ঢাকা সাব-এরিয়া (সাভার / গাজীপুর / নারায়ণগঞ্জ)</span>
+                                    <span class="text-stone-500">২ থেকে ৩ দিনে ডেলিভারি</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black text-stone-900">
+                                {% if free_delivery %}ফ্রি (Free){% else %}৳ ১০০{% endif %}
+                            </span>
+                        </label>
+
+                        <label class="flex items-center justify-between p-4 rounded-2xl border border-stone-300 cursor-pointer hover:bg-stone-50 transition">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="delivery_zone" value="OUTSIDE" class="text-stone-900 focus:ring-0">
+                                <div class="text-xs">
+                                    <span class="font-bold text-stone-900 block">ঢাকার বাইরে (সমগ্র বাংলাদেশ / Outside Dhaka)</span>
+                                    <span class="text-stone-500">হোম ডেলিভারি (২-৩ দিন)</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black text-stone-900">
+                                {% if free_delivery %}ফ্রি (Free){% else %}৳ ১৩০{% endif %}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div>
+                    <h2 class="text-base font-bold text-stone-900 flex items-center gap-2 border-b border-stone-100 pb-3 mb-3">
+                        <span>💵</span> ২. পেমেন্ট পদ্ধতি (Payment Method)
+                    </h2>
+                    
+                    <div class="space-y-2.5">
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border-2 border-stone-900 bg-stone-50 cursor-pointer">
+                            <input type="radio" name="payment_method" value="COD" checked class="text-stone-900 focus:ring-0">
+                            <div>
+                                <span class="font-bold text-stone-900 text-xs block">ক্যাশ অন ডেলিভারি (Cash on Delivery)</span>
+                                <span class="text-stone-600 text-[11px]">পণ্য হাতে পেয়ে দেখে টাকা পরিশোধ করুন</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-stone-200 cursor-pointer hover:bg-stone-50 transition">
+                            <input type="radio" name="payment_method" value="BKASH" class="text-stone-900 focus:ring-0">
+                            <div>
+                                <span class="font-bold text-stone-900 text-xs block">বিকাশ / নগদ (bKash / Nagad)</span>
+                                <span class="text-stone-500 text-[11px]">অর্ডার কনফার্ম করার পর মার্চেন্ট নম্বরে পেমেন্ট করতে পারবেন</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Optional Notes -->
+                <div>
+                    <label for="customer_notes" class="block text-xs font-bold text-stone-700 mb-1.5">
+                        বিশেষ কোনো নির্দেশনা (ঐচ্ছিক)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="customer_notes" 
+                        name="customer_notes" 
+                        placeholder="যেমন: ডেলিভারির পূর্বে কল করবেন" 
+                        class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-2.5 text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-900 font-medium"
+                    >
+                </div>
+
+            </div>
+
+            <!-- Right: Order Summary (4 Cols) -->
+            <div class="lg:col-span-4 bg-white p-6 sm:p-7 rounded-3xl border border-stone-200 shadow-sm space-y-5 sticky top-28">
+                <h3 class="text-sm font-bold text-stone-900 uppercase tracking-wider font-serif-title border-b border-stone-100 pb-3">
+                    অর্ডার তালিকা ({{ cart_items|length }}টি আইটেম)
+                </h3>
+
+                <!-- Cart Items Mini List -->
+                <div class="divide-y divide-stone-100 max-h-64 overflow-y-auto pr-1 text-xs">
+                    {% for item in cart_items %}
+                        <div class="py-2.5 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <img src="{{ item.image }}" alt="{{ item.name }}" class="w-10 h-12 object-cover rounded-lg border border-stone-200">
+                                <div>
+                                    <span class="font-bold text-stone-900 line-clamp-1">{{ item.name }}</span>
+                                    <span class="text-stone-500 text-[11px]">সাইজ: {{ item.size }} × {{ item.quantity }}টি</span>
+                                </div>
+                            </div>
+                            <span class="font-black text-stone-900 whitespace-nowrap">
+                                ৳ {% widthratio item.price 1 item.quantity %}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Financials -->
+                <div class="border-t border-stone-200 pt-3 space-y-2 text-xs">
+                    <div class="flex justify-between text-stone-600">
+                        <span>পোশাকের মূল্য (Subtotal):</span>
+                        <span class="font-bold text-stone-900 text-sm">{{ subtotal_bdt }}</span>
+                    </div>
+                    <div class="flex justify-between text-stone-600">
+                        <span>ডেলিভারি চার্জ:</span>
+                        {% if free_delivery %}
+                            <span class="font-bold text-emerald-700">ফ্রি (Free Delivery)</span>
+                        {% else %}
+                            <span class="font-bold text-stone-900">৳ ৭০ (ঢাকা মেট্রো)</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Place Order Button -->
+                <button 
+                    type="submit" 
+                    class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-stone-950 text-sm font-black uppercase tracking-wider rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                >
+                    <span>✓ অর্ডার নিশ্চিত করুন (Cash on Delivery)</span>
+                </button>
+
+                <div class="text-[11px] text-stone-500 text-center leading-relaxed">
+                    🔒 আপনার তথ্য সম্পূর্ণ সুরক্ষিত। অর্ডার সাবমিট করার পর আমাদের প্রতিনিধি আপনাকে নিশ্চিতকরণ কল করতে পারেন।
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
