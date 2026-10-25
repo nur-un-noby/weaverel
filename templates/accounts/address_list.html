@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}সংরক্ষিত ঠিকানা | {{ site_config.site_name|default:'Weaverel' }}{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-10 max-w-4xl mx-auto space-y-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-black font-serif-title text-stone-900">সংরক্ষিত ডেলিভারি ঠিকানা</h1>
+            <p class="text-xs text-stone-500 mt-1">দ্রুত চেকআউটের জন্য আপনার বাসা বা অফিসের ঠিকানা সংরক্ষণ করুন</p>
+        </div>
+        <a href="{% url 'accounts:address_add' %}" class="px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl transition shadow-md">
+            + নতুন ঠিকানা যোগ করুন
+        </a>
+    </div>
+
+    {% if addresses %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for addr in addresses %}
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-3 relative">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-stone-900 text-sm">{{ addr.title }}</span>
+                        {% if addr.is_default %}
+                            <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">ডিফল্ট ঠিকানা</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-xs text-stone-700 font-medium">
+                        <div>{{ addr.recipient_name }}</div>
+                        <div class="text-stone-500">📞 {{ addr.phone_number }}</div>
+                        <div class="mt-1 text-stone-600">{{ addr.address_line }}, {{ addr.district }}</div>
+                    </div>
+                    <div class="pt-3 border-t border-stone-100 flex items-center gap-3 text-xs">
+                        <a href="{% url 'accounts:address_edit' address_id=addr.id %}" class="font-bold text-amber-800 hover:underline">
+                            সম্পাদনা (Edit)
+                        </a>
+                        <span class="text-stone-300">•</span>
+                        <a href="{% url 'accounts:address_delete' address_id=addr.id %}" class="font-bold text-rose-600 hover:underline">
+                            মুছে ফেলুন (Delete)
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-3xl border border-stone-200 p-12 text-center max-w-md mx-auto space-y-4">
+            <span class="text-4xl block">📍</span>
+            <p class="text-xs text-stone-500">কোনো সংরক্ষিত ডেলিভারি ঠিকানা নেই।</p>
+            <a href="{% url 'accounts:address_add' %}" class="inline-block px-5 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition">
+                প্রথম ঠিকানা যোগ করুন
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

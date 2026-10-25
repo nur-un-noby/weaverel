@@ -1,0 +1,114 @@
+{% load i18n %}
+<!-- Out-of-band swap to update the header cart counter badge automatically -->
+<div hx-swap-oob="innerHTML:#cart-counter-badge">{{ cart.total_items }}</div>
+
+{% if cart_items %}
+    <div class="flex flex-col h-full justify-between">
+        
+        <!-- Free Delivery Threshold Notice -->
+        <div class="mb-4 p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs">
+            {% if is_free_shipping %}
+                <div class="flex items-center gap-2 text-emerald-800 font-bold">
+                    <span>🎉</span>
+                    <span>অভিনন্দন! আপনি ফ্রি ডেলিভারি পাচ্ছেন (Free Shipping Unlocked!)</span>
+                </div>
+            {% else %}
+                <div class="flex items-center justify-between font-semibold text-stone-700 mb-1">
+                    <span>ফ্রি ডেলিভারির জন্য আর প্রয়োজন:</span>
+                    <span class="font-bold text-amber-800">{{ needed_for_free_formatted }}</span>
+                </div>
+                <div class="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-600 h-full rounded-full transition-all duration-300" style="width: {% widthratio subtotal free_threshold 100 %}%;"></div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Items Scroll List -->
+        <div class="space-y-3 divide-y divide-stone-100 flex-grow overflow-y-auto pr-1">
+            {% for item in cart_items %}
+                <div class="pt-3 first:pt-0 flex gap-3 items-center">
+                    <img src="{{ item.variant.product.display_image }}" alt="{{ item.variant.product.name }}" class="w-16 h-20 object-cover rounded-lg bg-stone-100 flex-shrink-0">
+                    <div class="flex-grow min-w-0">
+                        <a href="{% url 'store:product_detail' slug=item.variant.product.slug %}" class="text-xs font-bold text-stone-900 truncate block hover:text-amber-800">
+                            {{ item.variant.product.name }}
+                        </a>
+                        <div class="flex items-center gap-2 text-[11px] text-stone-500 mt-0.5">
+                            <span class="bg-stone-100 px-1.5 py-0.5 rounded font-medium">সাইজ: {{ item.variant.size.name|default:'STD' }}</span>
+                            {% if item.variant.color %}
+                                <span>{{ item.variant.color.name }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-xs font-bold text-stone-900 mt-1">
+                            ৳ {{ item.variant.current_price|floatformat:0 }}
+                        </div>
+
+                        <!-- Quantity Modifier & Remove -->
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="inline-flex items-center border border-stone-200 rounded-lg bg-stone-50">
+                                <button 
+                                    hx-post="{% url 'cart:update_cart' item_id=item.id %}" 
+                                    hx-vals='{"action": "decrease"}' 
+                                    hx-target="#cart-drawer-content"
+                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-stone-200 rounded-l-lg"
+                                >-</button>
+                                <span class="w-7 text-center text-xs font-bold">{{ item.quantity }}</span>
+                                <button 
+                                    hx-post="{% url 'cart:update_cart' item_id=item.id %}" 
+                                    hx-vals='{"action": "increase"}' 
+                                    hx-target="#cart-drawer-content"
+                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-stone-200 rounded-r-lg"
+                                >+</button>
+                            </div>
+                            <button 
+                                hx-post="{% url 'cart:remove_from_cart' item_id=item.id %}" 
+                                hx-target="#cart-drawer-content"
+                                class="text-stone-400 hover:text-rose-600 text-xs font-medium transition"
+                                title="Remove"
+                            >
+                                ✕ বাদ দিন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Footer / Subtotal & Checkout -->
+        <div class="pt-4 border-t border-stone-200 mt-4 space-y-3">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-stone-600 font-medium">পণ্য উপমোট (Subtotal):</span>
+                <span class="font-bold text-stone-900 text-base">{{ subtotal_formatted }}</span>
+            </div>
+            <p class="text-[11px] text-stone-500 text-center">
+                🚚 ডেলিভারি চার্জ চেকআউটে ঠিকানা অনুযায়ী যোগ হবে।
+            </p>
+
+            <div class="grid grid-cols-2 gap-2">
+                <a href="{% url 'cart:cart_detail' %}" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-900 text-xs font-bold rounded-xl text-center transition">
+                    কার্ট দেখুন (View Cart)
+                </a>
+                <a href="{% url 'cart:checkout' %}" class="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl text-center transition shadow-md">
+                    {% if user.is_authenticated and not user.is_staff and not user.is_superuser %}
+                        অর্ডার করুন (Checkout) →
+                    {% else %}
+                        🔒 সাইন ইন ও অর্ডার →
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+
+    </div>
+{% else %}
+    <div class="flex flex-col items-center justify-center h-full text-center py-12 px-4 space-y-4">
+        <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-3xl">
+            🛒
+        </div>
+        <div class="space-y-1">
+            <h4 class="font-bold text-stone-900 text-sm">আপনার শপিং কার্ট সম্পূর্ণ খালি</h4>
+            <p class="text-xs text-stone-500">পছন্দের পাঞ্জাবি বা পোশাক খুঁজে কার্টে যুক্ত করুন।</p>
+        </div>
+        <a href="{% url 'store:home' %}" onclick="closeCartDrawer()" class="px-6 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition">
+            কেনাকাটা শুরু করুন →
+        </a>
+    </div>
+{% endif %}

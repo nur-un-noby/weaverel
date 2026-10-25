@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}আমার ড্যাশবোর্ড (My Account) | {{ site_config.site_name|default:'Weaverel' }}{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-10">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-black font-serif-title text-stone-900">
+                স্বাগতম, {{ user.first_name|default:user.username }}!
+            </h1>
+            <p class="text-xs text-stone-500 mt-1">
+                আপনার অ্যাকাউন্ট ড্যাশবোর্ড থেকে অর্ডার হিস্ট্রি ও ডেলিভারি ঠিকানা পরিচালনা করুন।
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'accounts:profile_edit' %}" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold rounded-xl transition">
+                ⚙️ প্রোফাইল পরিবর্তন
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition">
+                🚪 লগআউট
+            </a>
+        </div>
+    </div>
+
+    {% if user.is_staff %}
+    <div class="mb-8 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">👑</span>
+            <div>
+                <span class="text-xs font-bold text-amber-950 block">স্টাফ / অ্যাডমিন সুবিধা (Administrator Access)</span>
+                <span class="text-[11px] text-amber-800">আপনি স্টোরের সকল প্রোডাক্ট, অর্ডার, সেটিংস ও রিভিউ পরিচালনা করতে পারবেন।</span>
+            </div>
+        </div>
+        <a href="/admin/" target="_blank" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl transition shadow-sm whitespace-nowrap">
+            অ্যাডমিন প্যানেল ওপেন করুন →
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-1">
+            <span class="text-2xl">📦</span>
+            <div class="text-2xl font-black text-stone-900">{{ total_orders_count }}</div>
+            <div class="text-xs text-stone-500 font-medium">সর্বমোট অর্ডার (Total Orders)</div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-1">
+            <span class="text-2xl">📍</span>
+            <div class="text-2xl font-black text-stone-900">{{ user.profile.saved_addresses.count }}</div>
+            <div class="text-xs text-stone-500 font-medium">সংরক্ষিত ডেলিভারি ঠিকানা (Addresses)</div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-1">
+            <span class="text-2xl">🤍</span>
+            <div class="text-2xl font-black text-stone-900">{{ wishlist_count }}</div>
+            <div class="text-xs text-stone-500 font-medium">উইশলিস্ট আইটেম (Wishlist)</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Left 2 Cols: Recent Orders -->
+        <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-xs space-y-6">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-4">
+                <h3 class="font-bold text-base text-stone-900">সাম্প্রতিক অর্ডারসমূহ (Recent Orders)</h3>
+                <a href="{% url 'accounts:order_history' %}" class="text-xs font-bold text-amber-800 hover:underline">
+                    সব অর্ডার দেখুন →
+                </a>
+            </div>
+
+            {% if recent_orders %}
+                <div class="space-y-4 divide-y divide-stone-100">
+                    {% for order in recent_orders %}
+                        <div class="pt-4 first:pt-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black font-mono text-sm text-stone-900">#{{ order.order_number }}</span>
+                                    <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold
+                                        {% if order.status == 'DELIVERED' %}bg-emerald-100 text-emerald-800
+                                        {% elif order.status == 'CANCELLED' %}bg-rose-100 text-rose-800
+                                        {% else %}bg-amber-100 text-amber-800{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-stone-500">
+                                    তারিখ: {{ order.created_at|date:"d M Y" }} • মোট {{ order.total_items_count }} টি পোশাক
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-black text-sm text-stone-900">৳ {{ order.total_amount|floatformat:0 }}</span>
+                                <a href="{% url 'accounts:order_detail' order_number=order.order_number %}" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold rounded-xl transition">
+                                    বিস্তারিত →
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs text-stone-500 py-6 text-center">আপনি এখনো কোনো অর্ডার করেননি।</p>
+            {% endif %}
+        </div>
+
+        <!-- Right 1 Col: Saved Addresses & Profile Overview -->
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-3xl border border-stone-200 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                    <h3 class="font-bold text-sm text-stone-900">সংরক্ষিত ঠিকানা (Addresses)</h3>
+                    <a href="{% url 'accounts:address_add' %}" class="text-xs font-bold text-amber-800 hover:underline">
+                        + নতুন ঠিকানা
+                    </a>
+                </div>
+
+                {% if addresses %}
+                    <div class="space-y-3">
+                        {% for addr in addresses %}
+                            <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs space-y-1">
+                                <div class="flex items-center justify-between font-bold text-stone-900">
+                                    <span>{{ addr.title }}</span>
+                                    {% if addr.is_default %}
+                                        <span class="text-[10px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded">ডিফল্ট</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-stone-600">{{ addr.recipient_name }} • {{ addr.phone_number }}</div>
+                                <div class="text-stone-500 text-[11px]">{{ addr.address_line }}, {{ addr.district }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs text-stone-500 py-2">কোনো সংরক্ষিত ঠিকানা নেই।</p>
+                {% endif %}
+
+                <a href="{% url 'accounts:address_list' %}" class="block text-center text-xs font-bold text-stone-700 hover:text-stone-900 pt-2">
+                    সব ঠিকানা পরিচালনা করুন →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

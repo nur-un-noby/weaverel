@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}অর্ডার সফল হয়েছে | #{{ order.order_number }} | {{ site_config.site_name|default:'Weaverel' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        aside, header, footer, .no-print, button { display: none !important; }
+        body { background: white !important; color: black !important; }
+        .print-card { border: none !important; box-shadow: none !important; padding: 0 !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-12 max-w-4xl mx-auto">
+    
+    <!-- Top Success Notice (No Print) -->
+    <div class="no-print bg-emerald-50 border border-emerald-200 rounded-3xl p-6 sm:p-8 text-center space-y-3 mb-8 shadow-xs">
+        <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto shadow-md">
+            ✓
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black font-serif-title text-emerald-950">
+            ধন্যবাদ! আপনার অর্ডার সফলভাবে গৃহীত হয়েছে
+        </h1>
+        <p class="text-xs sm:text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed">
+            আপনার অর্ডারটি প্রসেসিংয়ে রয়েছে। শীঘ্রই আমাদের প্রতিনিধি ফোন করে অর্ডারটি কনফার্ম করবেন এবং কুরিয়ারে পাঠিয়ে দেওয়া হবে।
+        </p>
+        <div class="pt-3 flex flex-wrap justify-center gap-3">
+            <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-emerald-300 text-emerald-900 text-xs font-bold rounded-xl hover:bg-emerald-100 transition shadow-2xs">
+                🖨️ ইনভয়েস প্রিন্ট করুন (Print Invoice)
+            </button>
+            <a href="{% url 'store:track_order' %}?q={{ order.order_number }}" class="px-5 py-2.5 bg-emerald-900 text-white text-xs font-bold rounded-xl hover:bg-emerald-800 transition shadow-md">
+                📦 অর্ডার ট্র্যাক করুন (Track Order)
+            </a>
+            <a href="{% url 'store:home' %}" class="px-5 py-2.5 bg-stone-100 text-stone-800 text-xs font-bold rounded-xl hover:bg-stone-200 transition">
+                হোমে ফিরুন →
+            </a>
+        </div>
+    </div>
+
+    <!-- Official Printable Invoice / Packing Slip -->
+    <div class="print-card bg-white rounded-3xl border border-stone-200 p-8 sm:p-12 shadow-sm space-y-8">
+        
+        <!-- Invoice Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-stone-200">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="w-8 h-8 bg-stone-900 text-white rounded-lg flex items-center justify-center font-bold text-base">W</span>
+                    <span class="text-xl font-bold tracking-wider uppercase font-serif-title text-stone-900">{{ site_config.site_name|default:'WEAVEREL' }}</span>
+                </div>
+                <div class="text-xs text-stone-500">{{ site_config.site_name_bn|default:'উইভারেল অ্যাপারেল' }} | হটলাইন: {{ site_config.contact_phone|default:'01700-000000' }}</div>
+            </div>
+            <div class="text-left sm:text-right">
+                <span class="text-[10px] uppercase font-bold text-stone-400 tracking-widest block">অফিসিয়াল ইনভয়েস নং:</span>
+                <span class="text-xl font-black text-stone-950 font-mono">#{{ order.order_number }}</span>
+                <div class="text-xs text-stone-500 mt-0.5">তারিখ: {{ order.created_at|date:"d M Y, h:i A" }}</div>
+            </div>
+        </div>
+
+        <!-- Customer & Order Information Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-stone-600 bg-stone-50 p-6 rounded-2xl border border-stone-200">
+            <div>
+                <span class="font-bold text-stone-900 text-xs uppercase block mb-1.5">ক্রেতার বিবরণ (Billed To):</span>
+                <div class="font-bold text-stone-900 text-sm">{{ order.full_name }}</div>
+                <div class="font-semibold text-stone-800 mt-1">📞 {{ order.phone_number }}</div>
+                {% if order.alternative_phone %}
+                    <div>বিকল্প ফোন: {{ order.alternative_phone }}</div>
+                {% endif %}
+                {% if order.email %}
+                    <div>ইমেইল: {{ order.email }}</div>
+                {% endif %}
+            </div>
+            <div>
+                <span class="font-bold text-stone-900 text-xs uppercase block mb-1.5">ডেলিভারি ঠিকানা ও পেমেন্ট:</span>
+                <div class="text-stone-800 leading-relaxed">{{ order.address }}, {{ order.district }}</div>
+                <div class="mt-2 space-y-1">
+                    <div>
+                        <strong>পেমেন্ট মেথড:</strong> 
+                        <span class="font-bold text-amber-800">{{ order.get_payment_method_display }}</span>
+                    </div>
+                    <div>
+                        <strong>পেমেন্ট স্ট্যাটাস:</strong> 
+                        <span class="font-bold {% if order.payment_status == 'PAID' %}text-emerald-700{% else %}text-amber-700{% endif %}">
+                            {{ order.get_payment_status_display }}
+                        </span>
+                    </div>
+                    <div>
+                        <strong>অর্ডার স্ট্যাটাস:</strong> 
+                        <span class="font-bold text-stone-900">{{ order.get_status_display }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ordered Items Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border-b border-stone-200 text-xs">
+                <thead>
+                    <tr class="bg-stone-100 text-stone-800 font-bold border-y border-stone-200">
+                        <th class="p-3">#</th>
+                        <th class="p-3">পোশাকের বিবরণ (Item Details)</th>
+                        <th class="p-3 text-center">সাইজ (Size)</th>
+                        <th class="p-3 text-center">পরিমাণ (Qty)</th>
+                        <th class="p-3 text-right">একক মূল্য (Unit Price)</th>
+                        <th class="p-3 text-right">মোট (Total BDT)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    {% for item in items %}
+                        <tr>
+                            <td class="p-3 text-stone-400">{{ forloop.counter }}</td>
+                            <td class="p-3">
+                                <span class="font-bold text-stone-900 block">{{ item.product_name }}</span>
+                                <span class="text-[10px] text-stone-400 font-mono">SKU: {{ item.product_sku }}</span>
+                            </td>
+                            <td class="p-3 text-center font-bold text-stone-800">{{ item.size }}</td>
+                            <td class="p-3 text-center font-bold">{{ item.quantity }}</td>
+                            <td class="p-3 text-right">৳ {{ item.price|floatformat:0 }}</td>
+                            <td class="p-3 text-right font-black text-stone-950">৳ {{ item.total_price|floatformat:0 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Financial Totals -->
+        <div class="flex justify-end">
+            <div class="w-full sm:w-72 space-y-2 text-xs">
+                <div class="flex justify-between text-stone-600">
+                    <span>পোশাকের উপমোট (Subtotal):</span>
+                    <span class="font-bold text-stone-900">{{ subtotal_formatted }}</span>
+                </div>
+                {% if order.discount_amount > 0 %}
+                    <div class="flex justify-between text-emerald-700 font-bold">
+                        <span>কুপন ছাড় (Discount):</span>
+                        <span>-{{ discount_formatted }}</span>
+                    </div>
+                {% endif %}
+                <div class="flex justify-between text-stone-600">
+                    <span>ডেলিভারি চার্জ (Delivery Charge):</span>
+                    <span class="font-bold text-stone-800">{{ shipping_charge_formatted }}</span>
+                </div>
+                <div class="border-t border-stone-200 pt-2 flex justify-between text-sm font-black text-stone-950">
+                    <span>সর্বমোট প্রদেয় (Total Amount):</span>
+                    <span class="text-base font-black">{{ total_amount_formatted }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes & Signature Footer -->
+        <div class="pt-8 border-t border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 text-xs text-stone-500">
+            <div>
+                {% if order.customer_notes %}
+                    <div class="mb-2"><strong>কাস্টমার নোট:</strong> {{ order.customer_notes }}</div>
+                {% endif %}
+                <p>পণ্য গ্রহণের সময় অনুগ্রহ করে প্যাকেট খুলে দেখে নিন। কোনো সমস্যা হলে আমাদের হেল্পলাইনে কল করুন।</p>
+            </div>
+            <div class="text-right">
+                <div class="h-10 border-b border-stone-300 w-44"></div>
+                <span class="text-[10px] uppercase font-bold text-stone-400 mt-1 block">অনুমোদিত স্বাক্ষর (Weaverel)</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

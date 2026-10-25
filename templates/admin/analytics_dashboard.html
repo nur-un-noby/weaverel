@@ -1,0 +1,133 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n %}
+
+{% block content %}
+<div class="space-y-8" style="padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+        <div>
+            <h1 style="font-size: 24px; font-weight: 800; color: #111827; margin: 0;">📊 Weaverel Apparel — Executive Sales & Inventory Report</h1>
+            <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">Real-time business performance metrics (BDT ৳)</p>
+        </div>
+        <div>
+            <a href="/admin/orders/order/" style="background: #1f2937; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">Manage All Orders →</a>
+        </div>
+    </div>
+
+    <!-- 4 Key Financial Metrics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Total Orders Placed</div>
+            <div style="font-size: 28px; font-weight: 800; color: #111827; margin-top: 6px;">{{ total_orders }}</div>
+            <div style="font-size: 11px; color: #059669; font-weight: 600; margin-top: 4px;">{{ delivered_orders_count }} Delivered</div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Paid Revenue</div>
+            <div style="font-size: 28px; font-weight: 800; color: #059669; margin-top: 6px;">৳ {{ paid_revenue|floatformat:0 }}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Verified online & collected</div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">COD Awaiting Collection</div>
+            <div style="font-size: 28px; font-weight: 800; color: #d97706; margin-top: 6px;">৳ {{ cod_awaiting|floatformat:0 }}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Cash on Delivery with couriers</div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Pending Confirmation</div>
+            <div style="font-size: 28px; font-weight: 800; color: #dc2626; margin-top: 6px;">{{ pending_orders_count }}</div>
+            <div style="font-size: 11px; color: #dc2626; font-weight: 600; margin-top: 4px;">Requires customer call</div>
+        </div>
+    </div>
+
+    <!-- Inventory Low-Stock Warnings & Best Sellers -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+        
+        <!-- Low Stock Alerts -->
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <h3 style="font-size: 16px; font-weight: 700; color: #991b1b; margin-top: 0; margin-bottom: 12px;">⚠️ Low Stock Inventory Alert (≤ 10 Units)</h3>
+            {% if low_stock_variants %}
+                <table style="width: 100%; text-align: left; font-size: 12px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #f3f4f6; color: #6b7280;">
+                            <th style="padding: 8px 4px;">SKU</th>
+                            <th style="padding: 8px 4px;">Product</th>
+                            <th style="padding: 8px 4px;">Size / Color</th>
+                            <th style="padding: 8px 4px; text-align: right;">Stock Left</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in low_stock_variants %}
+                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                                <td style="padding: 8px 4px; font-family: monospace; font-weight: 600;">{{ v.sku }}</td>
+                                <td style="padding: 8px 4px; font-weight: 600;">{{ v.product.name }}</td>
+                                <td style="padding: 8px 4px; color: #4b5563;">{{ v.size.name }} / {{ v.color.name }}</td>
+                                <td style="padding: 8px 4px; text-align: right; font-weight: 800; color: {% if v.stock <= 3 %}#dc2626{% else %}#d97706{% endif %};">{{ v.stock }} units</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="font-size: 13px; color: #059669;">All product variants are well stocked!</p>
+            {% endif %}
+        </div>
+
+        <!-- Best Sellers -->
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-top: 0; margin-bottom: 12px;">🏆 Top Selling Clothing Items</h3>
+            {% if best_sellers %}
+                <table style="width: 100%; text-align: left; font-size: 12px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #f3f4f6; color: #6b7280;">
+                            <th style="padding: 8px 4px;">Product Name</th>
+                            <th style="padding: 8px 4px; text-align: center;">Units Sold</th>
+                            <th style="padding: 8px 4px; text-align: right;">Gross Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in best_sellers %}
+                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                                <td style="padding: 8px 4px; font-weight: 600;">{{ b.product__name }}</td>
+                                <td style="padding: 8px 4px; text-align: center; font-weight: 700;">{{ b.total_sold }} pcs</td>
+                                <td style="padding: 8px 4px; text-align: right; font-weight: 800; color: #059669;">৳ {{ b.total_sales|floatformat:0 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="font-size: 13px; color: #6b7280;">No sales recorded yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Active Promotion Coupons -->
+    <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-top: 0; margin-bottom: 12px;">🎟️ Promotional Coupon Performance</h3>
+        <table style="width: 100%; text-align: left; font-size: 12px; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #f3f4f6; color: #6b7280;">
+                    <th style="padding: 8px 4px;">Coupon Code</th>
+                    <th style="padding: 8px 4px;">Discount</th>
+                    <th style="padding: 8px 4px;">Min Spend</th>
+                    <th style="padding: 8px 4px; text-align: center;">Times Used</th>
+                    <th style="padding: 8px 4px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in coupons %}
+                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                        <td style="padding: 8px 4px; font-family: monospace; font-weight: 800; color: #111827;">{{ c.code }}</td>
+                        <td style="padding: 8px 4px; font-weight: 600;">{{ c.discount_value }}{% if c.discount_type == 'PERCENT' %}%{% else %} ৳{% endif %}</td>
+                        <td style="padding: 8px 4px; color: #4b5563;">৳ {{ c.min_purchase_amount|floatformat:0 }}</td>
+                        <td style="padding: 8px 4px; text-align: center; font-weight: 700;">{{ c.usage_count }} times</td>
+                        <td style="padding: 8px 4px;"><span style="background: #ecfdf5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Active</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

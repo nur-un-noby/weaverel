@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}অর্ডার ট্র্যাক করুন (Live Order Tracking) | Weaverel{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-4xl mx-auto px-4 sm:px-8 py-12">
+    
+    <!-- Title & Search Header -->
+    <div class="text-center space-y-3 mb-10">
+        <span class="inline-block px-3.5 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-bold uppercase tracking-wider">
+            📦 পার্সেল ট্র্যাকিং
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black font-serif-title text-stone-900">
+            আপনার অর্ডার ট্র্যাক করুন (Track Your Order)
+        </h1>
+        <p class="text-stone-500 text-xs sm:text-sm max-w-lg mx-auto">
+            আপনার অর্ডার নম্বর (যেমন: <code>#WV-03D400</code>) অথবা অর্ডারে ব্যবহৃত <strong>মোবাইল নম্বরটি</strong> নিচে লিখে সার্চ করুন
+        </p>
+
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'store:track_order' %}" class="max-w-md mx-auto pt-4 flex gap-2">
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ query|default:'' }}" 
+                required 
+                placeholder="অর্ডার নম্বর বা মোবাইল নম্বর..." 
+                class="flex-grow bg-white border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 font-medium shadow-xs"
+            >
+            <button 
+                type="submit" 
+                class="px-6 py-3 bg-stone-900 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center gap-1.5 whitespace-nowrap"
+            >
+                <span>🔍 খুঁজুন</span>
+            </button>
+        </form>
+    </div>
+
+    {% if searched %}
+        {% if order %}
+        <!-- Order Found: Visual Progress Timeline & Invoice -->
+        <div class="space-y-8 animate-fadeIn">
+            
+            <!-- Visual 5-Stage Timeline Card -->
+            <div class="bg-white rounded-3xl p-6 sm:p-9 border border-stone-200 shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-stone-100 pb-5">
+                    <div>
+                        <span class="text-xs text-stone-400 font-bold block uppercase">অর্ডার ট্র্যাকিং আইডি</span>
+                        <div class="text-xl font-black font-mono text-stone-900">#{{ order.order_number }}</div>
+                    </div>
+                    <div class="text-right sm:text-right">
+                        <span class="text-xs font-bold px-3 py-1 rounded-full border
+                            {% if order.status == 'DELIVERED' %} bg-emerald-50 text-emerald-800 border-emerald-200
+                            {% elif order.status == 'CANCELLED' %} bg-rose-50 text-rose-800 border-rose-200
+                            {% else %} bg-amber-50 text-amber-900 border-amber-200 {% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                        <div class="text-[11px] text-stone-400 mt-1">{{ order.created_at|date:"d M Y, h:i A" }}</div>
+                    </div>
+                </div>
+
+                <!-- 5 Steps Graphical Pipeline -->
+                <div class="py-4">
+                    <div class="grid grid-cols-5 gap-2 text-center relative">
+                        <!-- Step 1 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-xs
+                                {% if status_step >= 1 %} bg-emerald-600 text-white {% else %} bg-stone-100 text-stone-400 {% endif %}">
+                                ✓
+                            </div>
+                            <span class="text-[10px] sm:text-xs font-bold {% if status_step >= 1 %} text-stone-900 {% else %} text-stone-400 {% endif %}">
+                                অর্ডার গৃহীত
+                            </span>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-xs
+                                {% if status_step >= 2 %} bg-emerald-600 text-white {% else %} bg-stone-100 text-stone-400 {% endif %}">
+                                {% if status_step >= 2 %}✓{% else %}২{% endif %}
+                            </div>
+                            <span class="text-[10px] sm:text-xs font-bold {% if status_step >= 2 %} text-stone-900 {% else %} text-stone-400 {% endif %}">
+                                অর্ডার নিশ্চিত
+                            </span>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-xs
+                                {% if status_step >= 3 %} bg-emerald-600 text-white {% else %} bg-stone-100 text-stone-400 {% endif %}">
+                                {% if status_step >= 3 %}✓{% else %}৩{% endif %}
+                            </div>
+                            <span class="text-[10px] sm:text-xs font-bold {% if status_step >= 3 %} text-stone-900 {% else %} text-stone-400 {% endif %}">
+                                প্যাকিং সম্পন্ন
+                            </span>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-xs
+                                {% if status_step >= 4 %} bg-emerald-600 text-white {% else %} bg-stone-100 text-stone-400 {% endif %}">
+                                {% if status_step >= 4 %}✓{% else %}৪{% endif %}
+                            </div>
+                            <span class="text-[10px] sm:text-xs font-bold {% if status_step >= 4 %} text-stone-900 {% else %} text-stone-400 {% endif %}">
+                                কুরিয়ারে হস্তান্তর
+                            </span>
+                        </div>
+
+                        <!-- Step 5 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-xs
+                                {% if status_step >= 5 %} bg-emerald-600 text-white {% else %} bg-stone-100 text-stone-400 {% endif %}">
+                                {% if status_step >= 5 %}✓{% else %}৫{% endif %}
+                            </div>
+                            <span class="text-[10px] sm:text-xs font-bold {% if status_step >= 5 %} text-stone-900 {% else %} text-stone-400 {% endif %}">
+                                ডেলিভারি সম্পন্ন
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Expected Info -->
+                <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs text-stone-700 flex items-center gap-3">
+                    <span class="text-xl">🚚</span>
+                    <div>
+                        <strong>ডেলিভারি এরিয়া:</strong> {{ order.get_delivery_zone_display }} | 
+                        <strong>পেমেন্ট:</strong> {{ order.get_payment_method_display }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Details Breakdown Card -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-5">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-stone-500 border-b border-stone-100 pb-3">
+                    অর্ডারের বিস্তারিত তথ্য
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <span class="text-stone-400 block font-bold mb-0.5">গ্রাহকের নাম:</span>
+                        <div class="font-bold text-stone-900 text-sm">{{ order.full_name }}</div>
+                        <div class="text-stone-600 mt-0.5">📞 {{ order.phone_number }}</div>
+                    </div>
+                    <div>
+                        <span class="text-stone-400 block font-bold mb-0.5">ডেলিভারি ঠিকানা:</span>
+                        <div class="text-stone-900 font-medium leading-relaxed">{{ order.address }}</div>
+                    </div>
+                </div>
+
+                <!-- Items list -->
+                <div class="border-t border-stone-100 pt-4 divide-y divide-stone-100 text-xs">
+                    {% for item in order.items.all %}
+                        <div class="py-2.5 flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-stone-900">{{ item.product_name }}</span>
+                                <span class="text-stone-500 ml-2">(সাইজ: {{ item.size }}, পরিমাণ: {{ item.quantity }}টি)</span>
+                            </div>
+                            <span class="font-black text-stone-900">৳ {{ item.total_price|floatformat:"0" }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Total -->
+                <div class="border-t border-stone-200 pt-4 flex justify-between items-center text-sm font-bold text-stone-900">
+                    <span>সর্বমোট পরিশোধযোগ্য (Cash on Delivery):</span>
+                    <span class="text-amber-800 text-xl font-black">৳ {{ order.total_amount|floatformat:"0" }}</span>
+                </div>
+            </div>
+
+            <div class="text-center pt-2">
+                <a 
+                    href="https://wa.me/{{ site_config.whatsapp_number|default:'8801334202784' }}?text=আমার%20অর্ডার%20%23{{ order.order_number }}%20সম্পর্কে%20জানতে%20চাই।" 
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow"
+                >
+                    <span>💬 WhatsApp হেল্পলাইনে যোগাযোগ করুন</span>
+                </a>
+            </div>
+
+        </div>
+        {% else %}
+        <!-- Order Not Found State -->
+        <div class="bg-white rounded-3xl border border-stone-200 p-12 text-center max-w-lg mx-auto shadow-sm space-y-3">
+            <span class="text-4xl">🔍</span>
+            <h3 class="text-lg font-bold text-stone-900">কোনো অর্ডার পাওয়া যায়নি</h3>
+            <p class="text-stone-500 text-xs leading-relaxed">
+                আপনার দেওয়া নম্বরে (<code>{{ query }}</code>) কোনো সক্রিয় অর্ডার খুঁজে পাওয়া যায়নি। নম্বরটি আবার যাচাই করে সার্চ করুন অথবা আমাদের হেল্পলাইনে কল করুন।
+            </p>
+            <div class="pt-4 flex justify-center gap-3">
+                <a href="{% url 'store:track_order' %}" class="px-5 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition">
+                    আবার চেষ্টা করুন
+                </a>
+                <a href="tel:01700000000" class="px-5 py-2.5 bg-stone-100 text-stone-800 border border-stone-300 text-xs font-bold rounded-xl hover:bg-stone-200 transition">
+                    📞 হেল্পলাইনে কল দিন
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+    <!-- Initial Guide State -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6">
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 text-center space-y-2 shadow-2xs">
+            <span class="text-2xl">📱</span>
+            <h4 class="font-bold text-stone-900 text-xs">১. মোবাইল নম্বর দিন</h4>
+            <p class="text-stone-500 text-[11px] leading-relaxed">
+                অর্ডার করার সময় যে সচল মোবাইল নম্বরটি দিয়েছিলেন সেটি লিখুন।
+            </p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 text-center space-y-2 shadow-2xs">
+            <span class="text-2xl">⚡</span>
+            <h4 class="font-bold text-stone-900 text-xs">২. রিয়েল-টাইম স্ট্যাটাস</h4>
+            <p class="text-stone-500 text-[11px] leading-relaxed">
+                অর্ডার নিশ্চিতকরণ, প্যাকিং এবং কুরিয়ার ডেলিভারির সার্বক্ষণিক আপডেট পান।
+            </p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 text-center space-y-2 shadow-2xs">
+            <span class="text-2xl">💵</span>
+            <h4 class="font-bold text-stone-900 text-xs">৩. পণ্য পেয়ে টাকা দিন</h4>
+            <p class="text-stone-500 text-[11px] leading-relaxed">
+                ডেলিভারি ম্যান পৌঁছার পূর্বে কল করবেন। পণ্য দেখে মূল্য পরিশোধ করুন।
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

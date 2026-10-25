@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}{{ action }} ঠিকানা | {{ site_config.site_name|default:'Weaverel' }}{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-10 max-w-lg mx-auto">
+    <div class="bg-white p-8 rounded-3xl border border-stone-200 shadow-xs space-y-6">
+        <div>
+            <h1 class="text-2xl font-black font-serif-title text-stone-900">{{ action }} ডেলিভারি ঠিকানা</h1>
+            <p class="text-xs text-stone-500 mt-1">ঠিকানার বিবরণ সঠিকভাবে পূরণ করুন</p>
+        </div>
+
+        <form method="POST" class="space-y-4 text-xs">
+            {% csrf_token %}
+
+            <div>
+                <label class="block font-bold text-stone-700 mb-1">ঠিকানার নাম (যেমন: বাসা / অফিস):</label>
+                <input type="text" name="title" required value="{{ form.title.value|default:'বাসা (Home)' }}" class="w-full p-3 rounded-xl border border-stone-300">
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-700 mb-1">প্রাপকের নাম (Recipient Name):</label>
+                <input type="text" name="recipient_name" required value="{{ form.recipient_name.value|default:'' }}" class="w-full p-3 rounded-xl border border-stone-300">
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-700 mb-1">মোবাইল নম্বর (Phone Number):</label>
+                <input type="tel" name="phone_number" required value="{{ form.phone_number.value|default:'' }}" placeholder="017XXXXXXXX" class="w-full p-3 rounded-xl border border-stone-300">
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-700 mb-1">জেলা (District):</label>
+                <input type="text" name="district" required value="{{ form.district.value|default:'Dhaka' }}" class="w-full p-3 rounded-xl border border-stone-300">
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-700 mb-1">সম্পূর্ণ ঠিকানা (বাসা/রোড/এলাকা):</label>
+                <textarea name="address_line" rows="2" required class="w-full p-3 rounded-xl border border-stone-300">{{ form.address_line.value|default:'' }}</textarea>
+            </div>
+
+            <div>
+                <label class="flex items-center gap-2 cursor-pointer font-bold text-stone-800">
+                    <input type="checkbox" name="is_default" {% if form.is_default.value %}checked{% endif %} class="rounded text-stone-900">
+                    <span>এই ঠিকানাকে ডিফল্ট হিসেবে সেট করুন</span>
+                </label>
+            </div>
+
+            <div class="flex items-center gap-3 pt-3">
+                <button type="submit" class="px-6 py-3 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 transition">
+                    ঠিকানা সংরক্ষণ করুন
+                </button>
+                <a href="{% url 'accounts:address_list' %}" class="px-5 py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200 transition">
+                    বাতিল
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
