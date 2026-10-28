@@ -125,3 +125,79 @@ class CartAndCheckoutTests(TestCase):
         # Cart should be empty
         cart.refresh_from_db()
         self.assertEqual(cart.items.count(), 0)
+
+    def test_checkout_with_various_64_districts(self):
+        cart = Cart.objects.create(user=self.user)
+        add_item_to_cart(cart, self.variant.id, 1)
+
+        class MockRequest:
+            def __init__(self, u, c):
+                self.user = u
+                self.session = Client().session
+
+        mock_req = MockRequest(self.user, cart)
+
+        form_data = {
+            'full_name': 'Tamim Iqbal',
+            'phone_number': '01811223344',
+            'address': 'GEC Circle, Chattogram',
+            'district': 'Chattogram',
+            'delivery_zone': 'OUTSIDE',
+            'payment_method': Order.PAYMENT_COD,
+        }
+
+        order = process_checkout(mock_req, form_data)
+        self.assertEqual(order.district, 'Chattogram')
+
+        # Also test normalization of legacy alias
+        cart.delete()
+        cart2 = Cart.objects.create(user=self.user)
+        add_item_to_cart(cart2, self.variant.id, 1)
+        mock_req2 = MockRequest(self.user, cart2)
+        form_data2 = {
+            'full_name': 'Mushfiqur Rahim',
+            'phone_number': '01711998877',
+            'address': 'Bogra Sadar',
+            'district': 'Bogra',
+            'delivery_zone': 'OUTSIDE',
+            'payment_method': Order.PAYMENT_COD,
+        }
+        order2 = process_checkout(mock_req2, form_data2)
+        self.assertEqual(order2.district, 'Bogura')
+
+    def test_anonymous_client_checkout_with_valid_phone_via_http(self):
+        """Verify an anonymous client with a cart can proceed and place order using valid phone number."""
+        # 1. Add item to cart via HTTP as guest (just like a real visitor)
+        add_url = reverse('cart:add_to_cart', kwargs={'product_id': self.product.id})
+        resp_add = self.client.post(add_url, {'variant_id': self.variant.id, 'quantity': 1})
+        self.assertEqual(resp_add.status_code, 302)
+
+        # 2. Access checkout page as guest
+        checkout_url = reverse('cart:checkout')
+        resp_get = self.client.get(checkout_url)
+        self.assertEqual(resp_get.status_code, 200)
+        self.assertContains(resp_get, 'সচল মোবাইল নম্বর')
+
+        # 3. Post valid order with Bengali numeral phone number
+        resp_post = self.client.post(checkout_url, {
+            'full_name': 'মোঃ শাকিব',
+            'phone_number': '০১৭১২-৩৪৫৬৭৮',
+            'district': 'Dhaka',
+            'address': 'ধানমন্ডি ২৭, ঢাকা',
+            'delivery_zone': 'DHAKA',
+            'payment_method': Order.PAYMENT_COD,
+        })
+        self.assertEqual(resp_post.status_code, 302)
+
+        # 4. Check Order exists and success page is rendered
+        order = Order.objects.filter(phone_number='01712345678').first()
+        self.assertIsNotNone(order)
+        self.assertEqual(order.full_name, 'মোঃ শাকিব')
+        self.assertEqual(order.phone_number, '01712345678')
+        self.assertEqual(resp_post.url, reverse('cart:order_success', kwargs={'order_number': order.order_number}))
+
+        # 5. Access order success page
+        resp_success = self.client.get(resp_post.url)
+        self.assertEqual(resp_success.status_code, 200)
+        self.assertContains(resp_success, order.order_number)
+

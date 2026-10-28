@@ -26,8 +26,11 @@ def home(request):
     
     products = Product.objects.filter(is_available=True).select_related('category').prefetch_related('variants')
     
+    # Check for explicit reset flag
+    is_reset = request.GET.get('reset', '').strip() == '1'
+
     # Category Filter
-    selected_category_slug = request.GET.get('category', '').strip()
+    selected_category_slug = '' if is_reset else request.GET.get('category', '').strip()
     selected_category = None
     if selected_category_slug:
         selected_category = Category.objects.filter(slug=selected_category_slug, is_active=True).first()
@@ -35,7 +38,7 @@ def home(request):
             products = products.filter(category=selected_category)
 
     # Search Filter (bilingual search in English and Bangla)
-    query = request.GET.get('q', '').strip()
+    query = '' if is_reset else request.GET.get('q', '').strip()
     if query:
         products = products.filter(
             Q(name__icontains=query) |
@@ -50,23 +53,23 @@ def home(request):
         ).distinct()
 
     # Size filter
-    size_filter = request.GET.get('size', '').strip()
+    size_filter = '' if is_reset else request.GET.get('size', '').strip()
     if size_filter:
         products = products.filter(variants__size__name=size_filter).distinct()
 
     # Color filter
-    color_filter = request.GET.get('color', '').strip()
+    color_filter = '' if is_reset else request.GET.get('color', '').strip()
     if color_filter:
         products = products.filter(variants__color__name=color_filter).distinct()
 
     # In-stock only filter
-    in_stock_only = request.GET.get('in_stock', '').strip()
+    in_stock_only = '' if is_reset else request.GET.get('in_stock', '').strip()
     if in_stock_only == '1':
         products = products.filter(variants__stock__gt=0).distinct()
 
     # Price range filter
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    min_price = None if is_reset else request.GET.get('min_price')
+    max_price = None if is_reset else request.GET.get('max_price')
     if min_price:
         try:
             products = products.filter(price__gte=float(min_price))
@@ -79,7 +82,7 @@ def home(request):
             pass
 
     # Sorting
-    sort = request.GET.get('sort', '').strip()
+    sort = '' if is_reset else request.GET.get('sort', '').strip()
     if sort == 'price_low':
         products = products.order_by('price')
     elif sort == 'price_high':
@@ -92,9 +95,11 @@ def home(request):
         # Default: priority by display_order (admin managed), then featured, then newest
         products = products.order_by('display_order', '-is_featured', '-created_at')
 
-    # All products on a single clean page (no second page split right now)
+    has_active_filters = bool(selected_category or query or size_filter or color_filter or in_stock_only or min_price or max_price)
+
+    # Exactly 12 products per page
     total_count = products.count()
-    per_page = 24
+    per_page = 12
 
     paginator = Paginator(products, per_page)
     page_number = request.GET.get('page', 1)
@@ -132,6 +137,7 @@ def home(request):
         'min_price': min_price,
         'max_price': max_price,
         'total_count': total_count,
+        'has_active_filters': has_active_filters,
     }
 
     # HTMX Partial Rendering for smooth filter updates without full page reload
@@ -175,6 +181,48 @@ def product_detail(request, slug):
         is_available=True
     ).exclude(id=product.id)[:4]
 
+    # Exactly 3 related photos for product description section
+    description_photos = []
+    # 1. Product gallery images
+    for g_img in product.images.all():
+        img_url = g_img.display_image
+        if img_url and not any(p['url'] == img_url for p in description_photos):
+            description_photos.append({
+                'url': img_url,
+                'title': g_img.alt_text or f"{product.name} - ডিটেইল ফটো",
+                'badge': 'ডিটেইল ফটো',
+            })
+        if len(description_photos) >= 3:
+            break
+
+    # 2. If fewer than 3, add images from related products in the same category
+    if len(description_photos) < 3:
+        for rp in related_products:
+            rp_img = rp.display_image
+            if rp_img and not any(p['url'] == rp_img for p in description_photos):
+                description_photos.append({
+                    'url': rp_img,
+                    'title': f"{rp.name}",
+                    'badge': 'সম্পর্কিত পোশাক',
+                    'slug': rp.slug
+                })
+            if len(description_photos) >= 3:
+                break
+
+    # 3. Curated lifestyle/fabric detail fallbacks
+    curated_fallbacks = [
+        {'url': 'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80', 'title': '১০০% সুতি ফেব্রিক টেক্সচার', 'badge': 'ফেব্রিক জুম'},
+        {'url': 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80', 'title': 'নিখুঁত কলার ও স্টিচিং ডিটেইল', 'badge': 'হ্যান্ডক্রাফট'},
+        {'url': 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80', 'title': 'প্রিমিয়াম ফিট ও কাটিং', 'badge': 'ফিটিং ভিউ'},
+    ]
+    for fb in curated_fallbacks:
+        if len(description_photos) >= 3:
+            break
+        if not any(p['url'] == fb['url'] for p in description_photos):
+            description_photos.append(fb)
+
+    description_photos = description_photos[:3]
+
     context = {
         'product': product,
         'variants': variants,
@@ -185,6 +233,7 @@ def product_detail(request, slug):
         'review_count': reviews.count(),
         'avg_rating': avg_rating,
         'related_products': related_products,
+        'description_photos': description_photos,
     }
     return render(request, 'store/product_detail.html', context)
 

@@ -208,25 +208,14 @@ def checkout_view(request):
     - Cash on Delivery (ক্যাশ অন ডেলিভারি)
     - Coupon application
     - Safe concurrency inventory locking
-    - Strict customer account requirement (no anonymous or staff guest orders)
+    - Seamless checkout for both guest users (using valid phone number) and registered customers
     """
     cart = get_or_create_cart(request)
     if not cart.items.exists():
         messages.warning(request, "আপনার কার্ট খালি! অর্ডার করতে পণ্য যুক্ত করুন। (Your shopping cart is empty)")
         return redirect('store:home')
 
-    is_customer_authenticated = bool(
-        request.user.is_authenticated and
-        not request.user.is_staff and
-        not request.user.is_superuser
-    )
-
-    if not is_customer_authenticated:
-        if request.user.is_authenticated:
-            messages.warning(request, "অর্ডার সম্পন্ন করতে সাধারণ গ্রাহক অ্যাকাউন্টে সাইন ইন করা বাধ্যতামূলক। অনুগ্রহ করে সাধারণ গ্রাহক অ্যাকাউন্ট দিয়ে লগইন করুন।")
-        else:
-            messages.info(request, "অর্ডার সম্পন্ন করতে সাইন ইন করা প্রয়োজন। অনুগ্রহ করে আপনার অ্যাকাউন্ট দিয়ে সাইন ইন করুন।")
-        return redirect(f"{reverse('accounts:login')}?next={reverse('cart:checkout')}")
+    is_customer_authenticated = bool(request.user.is_authenticated)
 
     if request.method == 'POST':
         try:

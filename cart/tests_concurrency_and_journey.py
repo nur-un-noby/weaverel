@@ -86,10 +86,9 @@ class UserJourneyAndConcurrencyTests(TestCase):
         })
         self.assertEqual(resp_coupon.status_code, 200)
 
-        # 5.5 Verify unauthenticated client cannot order without an account
+        # 5.5 Verify unauthenticated client can access checkout directly
         resp_unauth = self.client.get(reverse('cart:checkout'))
-        self.assertEqual(resp_unauth.status_code, 302)
-        self.assertIn(reverse('accounts:login'), resp_unauth.url)
+        self.assertEqual(resp_unauth.status_code, 200)
 
         # 5.6 Automatic Gmail Login
         resp_login = self.client.post(reverse('accounts:google_auto_login'), {
@@ -179,43 +178,60 @@ class UserJourneyAndConcurrencyTests(TestCase):
         # Ensure only 1 order exists
         self.assertEqual(Order.objects.count(), 1)
 
-    def test_staff_and_superuser_cannot_access_checkout_or_place_order(self):
-        """Staff/superuser accounts cannot access client checkout or place client orders."""
+    def test_staff_and_guest_can_place_order_with_valid_phone(self):
+        """Staff/superuser accounts as well as guest clients can access checkout and place orders with valid phone numbers."""
         staff_user = User.objects.create_user(username='staff_admin', password='pass', is_staff=True, is_superuser=True)
         staff_cart = Cart.objects.create(user=staff_user)
         add_item_to_cart(staff_cart, self.variant.id, 1)
 
         self.client.login(username='staff_admin', password='pass')
 
-        # GET /cart/checkout/ should redirect to accounts:login
+        # GET /cart/checkout/ should succeed (200)
         resp_get = self.client.get(reverse('cart:checkout'))
-        self.assertEqual(resp_get.status_code, 302)
-        self.assertIn(reverse('accounts:login'), resp_get.url)
+        self.assertEqual(resp_get.status_code, 200)
 
-        # Direct POST to /cart/checkout/ should also redirect to accounts:login
+        # POST /cart/checkout/ with valid phone should place order successfully
         resp_post = self.client.post(reverse('cart:checkout'), {
             'full_name': 'Admin Person',
             'phone_number': '01711111111',
-            'address': 'Secret Office',
+            'address': 'Dhanmondi, Dhaka',
+            'district': 'Dhaka',
             'delivery_zone': 'DHAKA',
+            'payment_method': 'COD',
         })
         self.assertEqual(resp_post.status_code, 302)
-        self.assertIn(reverse('accounts:login'), resp_post.url)
+        admin_order = Order.objects.filter(phone_number='01711111111').first()
+        self.assertIsNotNone(admin_order)
 
-        # Service level should raise ValidationError
+    def test_guest_checkout_with_bengali_phone_digits(self):
+        """Guest users entering Bengali numeral phone numbers can proceed with order."""
+        # Restock variant
+        self.variant.stock = 5
+        self.variant.save()
+
+        session = self.client.session
+        session.create()
+        guest_cart = Cart.objects.create(session_key=session.session_key)
+        add_item_to_cart(guest_cart, self.variant.id, 1)
+
         class MockReq:
-            def __init__(self, c, u):
+            def __init__(self, c):
                 self.cart = c
-                self.user = u
+                self.user = None
                 self.session = Client().session
 
-        with self.assertRaises(ValidationError) as ctx:
-            process_checkout(MockReq(staff_cart, staff_user), {
-                'full_name': 'Admin Person',
-                'phone_number': '01711111111',
-                'address': 'Secret Office',
-            })
-        self.assertIn("অর্ডার করতে গ্রাহক একাউন্ট থাকা বাধ্যতামূলক", str(ctx.exception))
+        form_data = {
+            'full_name': 'রহিম উদ্দিন',
+            'phone_number': '০১৭১২-৩৪৫৬৭৮',  # Bengali numerals with dash
+            'address': 'মিরপুর ১০, ঢাকা',
+            'district': 'Dhaka',
+            'delivery_zone': 'DHAKA',
+            'payment_method': 'COD',
+        }
+        order = process_checkout(MockReq(guest_cart), form_data)
+        self.assertIsNotNone(order)
+        self.assertEqual(order.phone_number, '01712345678')
+        self.assertEqual(order.full_name, 'রহিম উদ্দিন')
 
     def test_invalid_phone_number_rejected_during_checkout(self):
         """Invalid phone numbers like 'ghdfsh' or short numbers must be rejected."""

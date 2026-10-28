@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
+from .models import validate_bangladesh_phone
 
 UserModel = get_user_model()
 
@@ -8,7 +9,7 @@ UserModel = get_user_model()
 class EmailOrUsernameModelBackend(ModelBackend):
     """
     Authentication backend that allows users to authenticate using either
-    their username or their registered email address.
+    their username, their registered email address, or their verified phone number.
     Lookup is case-insensitive for both fields.
     """
     def authenticate(self, request, username=None, password=None, **kwargs):
@@ -19,12 +20,13 @@ class EmailOrUsernameModelBackend(ModelBackend):
             return None
 
         clean_identifier = str(username).strip()
+        is_phone, clean_phone = validate_bangladesh_phone(clean_identifier)
 
         try:
-            # Match either username or email case-insensitively
-            user = UserModel.objects.filter(
-                Q(username__iexact=clean_identifier) | Q(email__iexact=clean_identifier)
-            ).first()
+            lookup = Q(username__iexact=clean_identifier) | Q(email__iexact=clean_identifier)
+            if is_phone:
+                lookup |= Q(profile__phone_number=clean_phone)
+            user = UserModel.objects.filter(lookup).first()
         except Exception:
             return None
 

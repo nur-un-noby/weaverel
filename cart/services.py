@@ -7,6 +7,7 @@ from .models import Cart, CartItem
 from store.models import Product, ProductVariant
 from shipping.models import ShippingZone
 from shipping.services import calculate_shipping_charge
+from shipping.districts import normalize_district
 from promotions.models import Coupon, CouponUsage
 from promotions.services import validate_coupon_code
 from store_settings.models import SiteConfiguration
@@ -162,8 +163,6 @@ def process_checkout(request, form_data):
         raise ValidationError(_("Your shopping cart is empty."))
 
     user = request.user if (getattr(request, 'user', None) and request.user.is_authenticated) else None
-    if not user or not user.is_authenticated or user.is_staff or user.is_superuser:
-        raise ValidationError(_("অর্ডার করতে গ্রাহক একাউন্ট থাকা বাধ্যতামূলক। (A customer account is required to place an order)"))
 
     phone = form_data.get('phone_number', '').strip()
     full_name = form_data.get('full_name', '').strip()
@@ -179,9 +178,36 @@ def process_checkout(request, form_data):
 
     is_valid_phone, clean_phone = validate_bangladesh_phone(phone)
     if not is_valid_phone:
-        raise ValidationError(_("সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)"))
+        raise ValidationError(_("সঠিক ১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX বা ০১৭১২৩৪৫৬৭৮)"))
 
     phone = clean_phone
+
+    # Clean alternative phone if provided
+    alt_phone = form_data.get('alternative_phone', '').strip()
+    if alt_phone:
+        is_alt_valid, clean_alt = validate_bangladesh_phone(alt_phone)
+        if is_alt_valid:
+            alt_phone = clean_alt
+
+    # If unauthenticated, associate with existing customer profile if matched by phone
+    if not user:
+        from accounts.models import CustomerProfile
+        matched_profile = CustomerProfile.objects.filter(phone_number=phone).select_related('user').first()
+        if matched_profile and matched_profile.user:
+            user = matched_profile.user
+
+    # If user is logged in, sync phone and address to profile if currently empty
+    if user and hasattr(user, 'profile'):
+        profile_updated = False
+        if not user.profile.phone_number:
+            user.profile.phone_number = phone
+            profile_updated = True
+        if not user.profile.address and address:
+            user.profile.address = address
+            user.profile.district = normalize_district(form_data.get('district', 'Dhaka'))
+            profile_updated = True
+        if profile_updated:
+            user.profile.save()
 
     # 1. Lock and validate inventory concurrently
     item_ids = list(cart.items.values_list('id', flat=True))
@@ -208,11 +234,11 @@ def process_checkout(request, form_data):
         user=user,
         full_name=full_name,
         phone_number=phone,
-        alternative_phone=form_data.get('alternative_phone', '').strip(),
+        alternative_phone=alt_phone,
         email=email,
         delivery_zone=delivery_zone_code,
         shipping_zone=financials['zone'],
-        district=form_data.get('district', 'Dhaka'),
+        district=normalize_district(form_data.get('district', 'Dhaka')),
         address=address,
         payment_method=payment_method,
         payment_status=Order.PAYMENT_STATUS_PENDING,

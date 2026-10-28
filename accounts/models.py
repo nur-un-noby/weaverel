@@ -6,23 +6,39 @@ from django.utils.translation import gettext_lazy as _
 import re
 
 
+BENGALI_TO_ASCII_DIGITS = str.maketrans('০১২৩৪৫৬৭৮৯', '0123456789')
+
+
 def validate_bangladesh_phone(phone):
     """
     Validates Bangladesh standard mobile phone numbers.
-    Accepts 013, 014, 015, 016, 017, 018, 019 formats (11 digits, or with +880 / 880).
+    Accepts 013, 014, 015, 016, 017, 018, 019 formats (11 digits, or with +880 / 880 / Bengali digits).
+    Cleans punctuation, invisible unicode markers, whitespace, and country prefixes.
+    Returns (is_valid: bool, clean_phone: str).
     """
-    clean = re.sub(r'[\s\-\(\)]', '', str(phone or ''))
-    if clean.startswith('+88'):
-        clean = clean[3:]
-    elif clean.startswith('88'):
-        clean = clean[2:]
-    
-    if not clean.startswith('0') and len(clean) == 10:
-        clean = '0' + clean
-    
-    # Must be 11 digits starting with 01[3-9]
+    if not phone:
+        return False, ''
+
+    # 1. Convert Bengali numerals to ASCII numerals
+    converted = str(phone).translate(BENGALI_TO_ASCII_DIGITS)
+
+    # 2. Extract digits only
+    digits = re.sub(r'\D', '', converted)
+
+    # 3. Strip international BD prefix (+88 / 88 / 880)
+    if digits.startswith('880'):
+        digits = digits[2:]  # leaves 01...
+    elif digits.startswith('88') and len(digits) > 11:
+        digits = digits[2:]
+
+    # 4. Handle 10-digit number missing leading 0 (e.g. 1712345678)
+    if not digits.startswith('0') and len(digits) == 10 and digits.startswith(('13', '14', '15', '16', '17', '18', '19')):
+        digits = '0' + digits
+
+    # 5. Standard Bangladesh mobile pattern: exactly 11 digits starting with 01[3-9]
     pattern = r'^01[3-9]\d{8}$'
-    return bool(re.match(pattern, clean)), clean
+    is_valid = bool(re.match(pattern, digits))
+    return is_valid, digits if is_valid else str(phone).strip()
 
 
 class CustomerProfile(models.Model):

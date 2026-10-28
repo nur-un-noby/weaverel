@@ -30,8 +30,16 @@
             </div>
 
             <div>
-                <label class="block font-bold text-stone-700 mb-1">জেলা (District):</label>
-                <input type="text" name="district" required value="{{ form.district.value|default:'Dhaka' }}" class="w-full p-3 rounded-xl border border-stone-300">
+                <label class="block font-bold text-stone-700 mb-1">জেলা (District / ৬৪ জেলা):</label>
+                <select name="district" required class="w-full p-3 rounded-xl border border-stone-300 font-medium focus:ring-1 focus:ring-stone-900 focus:outline-none">
+                    {% for div in bangladesh_divisions %}
+                        <optgroup label="{{ div.division_bn }} ({{ div.division_en }} Division)">
+                            {% for code, label in div.districts %}
+                                <option value="{{ code }}" {% if form.district.value == code or not form.district.value and code == 'Dhaka' or form.district.value == 'Chittagong' and code == 'Chattogram' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>
             </div>
 
             <div>

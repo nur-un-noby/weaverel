@@ -88,11 +88,7 @@
                     কার্ট দেখুন (View Cart)
                 </a>
                 <a href="{% url 'cart:checkout' %}" class="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl text-center transition shadow-md">
-                    {% if user.is_authenticated and not user.is_staff and not user.is_superuser %}
-                        অর্ডার করুন (Checkout) →
-                    {% else %}
-                        🔒 সাইন ইন ও অর্ডার →
-                    {% endif %}
+                    অর্ডার করুন (Checkout) →
                 </a>
             </div>
         </div>

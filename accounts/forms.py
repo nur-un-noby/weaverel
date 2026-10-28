@@ -9,12 +9,12 @@ from .models import CustomerProfile, Address, validate_bangladesh_phone
 
 class CustomerLoginForm(AuthenticationForm):
     """
-    Standard customer login form supporting username or email address.
+    Standard customer login form supporting username, email address, or mobile number.
     """
     username = forms.CharField(
-        label=_("ইউজারনেম অথবা ইমেইল (Username or Email)"),
+        label=_("ইউজারনেম, ইমেইল অথবা মোবাইল নম্বর (Username, Email, or Phone)"),
         widget=forms.TextInput(attrs={
-            'placeholder': _("ইউজারনেম বা ইমেইল অ্যাড্রেস লিখুন"),
+            'placeholder': _("ইউজারনেম, ইমেইল বা মোবাইল নম্বর (যেমন: 017XXXXXXXX)"),
             'class': 'w-full p-3 rounded-xl border border-stone-300 focus:ring-1 focus:ring-stone-900 focus:outline-none text-xs',
             'autofocus': True,
         })
@@ -78,6 +78,9 @@ class CustomerRegistrationForm(forms.ModelForm):
         return user
 
 
+from shipping.districts import BANGLADESH_DISTRICT_CHOICES, normalize_district
+
+
 class CustomerProfileForm(forms.ModelForm):
     first_name = forms.CharField(max_length=50, required=True)
     last_name = forms.CharField(max_length=50, required=True)
@@ -86,6 +89,10 @@ class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = CustomerProfile
         fields = ('phone_number', 'alternative_phone', 'district', 'address')
+
+    def clean_district(self):
+        district = self.cleaned_data.get('district')
+        return normalize_district(district)
 
     def clean_phone_number(self):
         phone = self.cleaned_data.get('phone_number')
@@ -101,6 +108,10 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         fields = ('title', 'recipient_name', 'phone_number', 'district', 'address_line', 'is_default')
+
+    def clean_district(self):
+        district = self.cleaned_data.get('district')
+        return normalize_district(district)
 
     def clean_phone_number(self):
         phone = self.cleaned_data.get('phone_number')

@@ -237,7 +237,7 @@ class Command(BaseCommand):
             cat_objs[cat.slug] = cat
             self.stdout.write(f"Created category: {cat.name}")
 
-        # 9. Realistic Products with Variants
+        # 9. Realistic Products with Variants (16 Products with 3 Gallery Photos Each)
         products_info = [
             {
                 'category': cat_objs['panjabi'],
@@ -258,7 +258,8 @@ class Command(BaseCommand):
                 'colors': ['Royal Navy', 'Pearl White', 'Maroon'],
                 'gallery': [
                     'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
-                    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -280,6 +281,8 @@ class Command(BaseCommand):
                 'colors': ['Pearl White', 'Beige / Khaki'],
                 'gallery': [
                     'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -300,7 +303,9 @@ class Command(BaseCommand):
                 'sizes': ['M', 'L', 'XL', 'XXL'],
                 'colors': ['Jet Black', 'Pearl White', 'Charcoal Grey'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -321,7 +326,9 @@ class Command(BaseCommand):
                 'sizes': ['38', '40', '42', '44'],
                 'colors': ['Pearl White', 'Beige / Khaki', 'Jet Black'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -342,7 +349,9 @@ class Command(BaseCommand):
                 'sizes': ['M', 'L', 'XL', 'XXL'],
                 'colors': ['Sky Blue', 'Pearl White'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1620012253295-c15c429f66bf?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -363,7 +372,9 @@ class Command(BaseCommand):
                 'sizes': ['M', 'L', 'XL'],
                 'colors': ['Jet Black', 'Forest Green', 'Charcoal Grey'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -384,7 +395,9 @@ class Command(BaseCommand):
                 'sizes': ['38', '40', '42', '44'],
                 'colors': ['Beige / Khaki', 'Jet Black', 'Royal Navy'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1479064555552-3ef4979f8908?auto=format&fit=crop&w=800&q=80',
                 ]
             },
             {
@@ -405,7 +418,193 @@ class Command(BaseCommand):
                 'sizes': ['M', 'L', 'XL', 'XXL'],
                 'colors': ['Royal Navy', 'Maroon', 'Forest Green'],
                 'gallery': [
-                    'https://images.unsplash.com/photo-1625910513413-7e3e9d8e75e6?auto=format&fit=crop&w=800&q=80'
+                    'https://images.unsplash.com/photo-1625910513413-7e3e9d8e75e6?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['panjabi'],
+                'name': 'Luxury Jacquard Weave Festive Panjabi',
+                'name_bn': 'লাক্সারি জাকুয়ার্ড উইভ ফেস্টিভ পাঞ্জাবি',
+                'sku': 'WV-PAN-03',
+                'description': 'Bespoke jacquard weave cotton with self-pattern design. Features tailored band collar, hidden pockets, and brass finished buttons.',
+                'description_bn': 'সেলফ-টেক্সচার্ড জাকুয়ার্ড বোনা কটন পাঞ্জাবি। মার্জিত ব্যান্ড কলার, অভ্যন্তরীণ পকেট এবং ব্রাস ফিনিশ বাটন। ঈদ ও বিশেষ অনুষ্ঠানের আভিজাত্যের প্রতীক।',
+                'fabric_details': 'Jacquard Combed Cotton / জাকুয়ার্ড সুতি',
+                'fabric_details_bn': '১০০% লাক্সারি জাকুয়ার্ড সুতি',
+                'price': Decimal('2750.00'),
+                'discount_price': Decimal('2250.00'),
+                'image_url': 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+                'badge': 'EXCLUSIVE',
+                'is_featured': True,
+                'is_new_arrival': True,
+                'sizes': ['38', '40', '42', '44'],
+                'colors': ['Royal Navy', 'Jet Black', 'Pearl White'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['panjabi'],
+                'name': 'Pure Linen Breathable Summer Panjabi',
+                'name_bn': 'পিওর লিনেন সামার কুলিং পাঞ্জাবি',
+                'sku': 'WV-PAN-04',
+                'description': 'Pure organic flax linen Panjabi designed for cooling airflow during warm weather. Soft enzyme-washed feel.',
+                'description_bn': 'খাঁটি লিনেন সুতায় তৈরি অত্যন্ত আরামদায়ক ও বাতাস চলাচল উপযোগী সামার পাঞ্জাবি। গরমে পরার জন্য আদর্শ।',
+                'fabric_details': '100% Pure Organic Linen',
+                'fabric_details_bn': '১০০% পিওর অরগানিক লিনেন',
+                'price': Decimal('2600.00'),
+                'discount_price': Decimal('2100.00'),
+                'image_url': 'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                'badge': 'SUMMER PICK',
+                'is_featured': False,
+                'is_new_arrival': True,
+                'sizes': ['38', '40', '42', '44', '46'],
+                'colors': ['Beige / Khaki', 'Sky Blue', 'Pearl White'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['jubba-thobe'],
+                'name': 'Saudi Standing Collar Crisp White Thobe',
+                'name_bn': 'সৌদি স্ট্যান্ডিং কলার ক্রিস্প হোয়াইট থোব',
+                'sku': 'WV-JUB-02',
+                'description': 'Classic Saudi cut Jubba with structured high collar, french cuffs, and deep chest pocket. Premium crisp Japanese spun poly fabric.',
+                'description_bn': 'সৌদি স্টাইল স্ট্যান্ডিং কলার সাদা জুব্বা। ফ্রেঞ্চ কাফ ও নিখুঁত পকেট সেলাই। মসৃণ রিঙ্কল-ফ্রি ফেব্রিক।',
+                'fabric_details': 'Japanese Spun Polyester Fabric',
+                'fabric_details_bn': 'জাপানি স্পান পলিয়েস্টার মসৃণ ফেব্রিক',
+                'price': Decimal('2950.00'),
+                'discount_price': Decimal('2550.00'),
+                'image_url': 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                'badge': 'PREMIUM',
+                'is_featured': True,
+                'is_new_arrival': False,
+                'sizes': ['M', 'L', 'XL', 'XXL'],
+                'colors': ['Pearl White'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['shirts'],
+                'name': 'Fine Striped Business Executive Cotton Shirt',
+                'name_bn': 'ফাইন স্ট্রাইপড বিজনেস এক্সিকিউটিভ শার্ট',
+                'sku': 'WV-SH-02',
+                'description': 'Vertical micro-stripe 100% Giza cotton formal shirt. Spread collar and dual-button barrel cuffs for boardrooms and meetings.',
+                'description_bn': '১০০% গিজা কটন কাপড়ে তৈরি মাইক্রো-স্ট্রাইপ ফরমাল শার্ট। অফিস ও মিটিংয়ে রুচিশীল আউটলুকের নিশ্চয়তা।',
+                'fabric_details': '100% Egyptian Giza Cotton',
+                'fabric_details_bn': '১০০% প্রিমিয়াম গিজা কটন',
+                'price': Decimal('1790.00'),
+                'discount_price': Decimal('1450.00'),
+                'image_url': 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+                'badge': 'EXECUTIVE',
+                'is_featured': False,
+                'is_new_arrival': True,
+                'sizes': ['M', 'L', 'XL', 'XXL'],
+                'colors': ['Sky Blue', 'Charcoal Grey'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1620012253295-c15c429f66bf?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['shirts'],
+                'name': 'Matte Black Mandarin Collar Linen Shirt',
+                'name_bn': 'ম্যাট ব্ল্যাক মান্দারিন কলার লিনেন শার্ট',
+                'sku': 'WV-SH-03',
+                'description': 'Contemporary band-collar linen-cotton shirt. Clean minimal styling with matte buttons, tailored for Friday casuals and dinner parties.',
+                'description_bn': 'আধুনিক মান্দারিন কলার লিনেন-কটন শার্ট। ম্যাট বোতাম ও স্লিম ফিটিং, ক্যাজুয়াল হ্যাংআউটের জন্য অত্যন্ত মানানসই।',
+                'fabric_details': 'Linen Cotton Weave / লিনেন কটন',
+                'fabric_details_bn': '৫৫% লিনেন, ৪৫% কম্বড সুতি',
+                'price': Decimal('1750.00'),
+                'discount_price': Decimal('1390.00'),
+                'image_url': 'https://images.unsplash.com/photo-1620012253295-c15c429f66bf?auto=format&fit=crop&w=800&q=80',
+                'badge': 'BESTSELLER',
+                'is_featured': True,
+                'is_new_arrival': True,
+                'sizes': ['M', 'L', 'XL'],
+                'colors': ['Jet Black', 'Forest Green'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1620012253295-c15c429f66bf?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['t-shirts'],
+                'name': 'Supima Cotton Minimalist Crewneck T-Shirt',
+                'name_bn': 'সুপিমা কটন মিনিমালিস্ট ক্রু-নেক টি-শার্ট',
+                'sku': 'WV-TSH-02',
+                'description': 'Extra-long staple American Supima cotton tee with ultra-soft hand feel and exceptional color fastness.',
+                'description_bn': 'আমেরিকান সুপিমা সুতায় তৈরি আল্ট্রা-সফট ক্রু-নেক টি-শার্ট। দীর্ঘস্থায়ী ও অসাধারণ আরামদায়ক।',
+                'fabric_details': '100% American Supima Cotton',
+                'fabric_details_bn': '১০০% আমেরিকান সুপিমা কটন',
+                'price': Decimal('950.00'),
+                'discount_price': Decimal('750.00'),
+                'image_url': 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+                'badge': 'ESSENTIAL',
+                'is_featured': False,
+                'is_new_arrival': True,
+                'sizes': ['M', 'L', 'XL'],
+                'colors': ['Pearl White', 'Royal Navy', 'Charcoal Grey'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['polo-shirts'],
+                'name': 'Contrast Tipped Luxury Pique Polo Shirt',
+                'name_bn': 'কন্ট্রাস্ট টিপড লাক্সারি পিকু পোলো শার্ট',
+                'sku': 'WV-POL-02',
+                'description': 'Mercerized cotton polo shirt featuring dual tipped collar and cuff details. Mother of pearl buttons.',
+                'description_bn': 'মার্সারাইজড কটন পোলো শার্ট — কলার ও হাতায় আকর্ষণীয় টুইন স্ট্রাইপ কন্ট্রাস্ট ও মাদার অব পার্ল বাটন।',
+                'fabric_details': 'Mercerized 100% Pique Cotton',
+                'fabric_details_bn': 'মার্সারাইজড ১০০% পিকু কটন',
+                'price': Decimal('1350.00'),
+                'discount_price': Decimal('1090.00'),
+                'image_url': 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
+                'badge': 'TRENDING',
+                'is_featured': True,
+                'is_new_arrival': True,
+                'sizes': ['M', 'L', 'XL', 'XXL'],
+                'colors': ['Forest Green', 'Royal Navy', 'Jet Black'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1625910513413-7e3e9d8e75e6?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+                ]
+            },
+            {
+                'category': cat_objs['pants-trousers'],
+                'name': 'Tailored Charcoal Grey Formal Trousers',
+                'name_bn': 'টেইলর্ড চারকোল গ্রে ফরমাল ট্রাউজার',
+                'sku': 'WV-PNT-02',
+                'description': 'Flat-front slim-fit formal trousers crafted from lightweight tropical wool-blend fabric with internal grip waistband.',
+                'description_bn': 'ফ্ল্যাট-ফ্রন্ট স্লিম-ফিট ফরমাল প্যান্ট। আরামদায়ক ট্রপিক্যাল ব্লেন্ড ফেব্রিক, সারাদিনের অফিস ব্যবহারে নিখুঁত।',
+                'fabric_details': 'Tropical Poly-Viscose Blend',
+                'fabric_details_bn': 'হালকা ট্রপিক্যাল পলিয়েস্টার ভিসকোস',
+                'price': Decimal('1950.00'),
+                'discount_price': Decimal('1590.00'),
+                'image_url': 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80',
+                'badge': 'FORMAL WEAR',
+                'is_featured': False,
+                'is_new_arrival': True,
+                'sizes': ['38', '40', '42', '44'],
+                'colors': ['Charcoal Grey', 'Jet Black'],
+                'gallery': [
+                    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1479064555552-3ef4979f8908?auto=format&fit=crop&w=800&q=80',
                 ]
             },
         ]

@@ -106,3 +106,86 @@ class StoreCatalogTests(TestCase):
         resp_sitemap = self.client.get(reverse('store:sitemap_xml'))
         self.assertEqual(resp_sitemap.status_code, 200)
         self.assertIn(b"<urlset", resp_sitemap.content)
+
+    def test_twelve_products_per_page_pagination(self):
+        # Create additional products to reach 15 products total
+        for i in range(2, 16):
+            Product.objects.create(
+                category=self.category,
+                name=f"Demo Clothing Product {i}",
+                name_bn=f"ডেমো পোশাক {i}",
+                slug=f"demo-product-{i}",
+                sku=f"WV-TST-{i:02d}",
+                price=Decimal("1500.00"),
+                is_available=True,
+                display_order=i
+            )
+
+        # Page 1: exactly 12 products
+        resp_page1 = self.client.get(reverse('store:home'))
+        self.assertEqual(resp_page1.status_code, 200)
+        page1_obj = resp_page1.context['page_obj']
+        self.assertEqual(len(page1_obj.object_list), 12)
+        self.assertEqual(page1_obj.paginator.per_page, 12)
+        self.assertEqual(page1_obj.paginator.num_pages, 2)
+        self.assertTrue(page1_obj.has_next())
+
+        # Page 2: remaining 3 products (15 - 12 = 3)
+        resp_page2 = self.client.get(reverse('store:home'), {'page': 2})
+        self.assertEqual(resp_page2.status_code, 200)
+        page2_obj = resp_page2.context['page_obj']
+        self.assertEqual(len(page2_obj.object_list), 3)
+        self.assertTrue(page2_obj.has_previous())
+
+    def test_product_description_three_related_photos(self):
+        from store.models import ProductImage
+        # Add 3 gallery images to product
+        for idx in range(1, 4):
+            ProductImage.objects.create(
+                product=self.product,
+                image_url=f"https://images.unsplash.com/photo-{idx}",
+                alt_text=f"Detail Photo #{idx}",
+                display_order=idx
+            )
+
+        resp = self.client.get(reverse('store:product_detail', kwargs={'slug': self.product.slug}))
+        self.assertEqual(resp.status_code, 200)
+        photos = resp.context['description_photos']
+        self.assertEqual(len(photos), 3)
+        self.assertContains(resp, "পোশাকের সম্পর্কিত ছবি ও ফিনিশিং (3 Related Photos)")
+        self.assertContains(resp, "Detail Photo #1")
+        self.assertContains(resp, "Detail Photo #2")
+        self.assertContains(resp, "Detail Photo #3")
+
+    def test_reduced_image_aspect_ratio_in_templates(self):
+        # Grid partial has aspect-square
+        resp = self.client.get(reverse('store:home'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "aspect-square")
+
+        # Product detail has aspect-square
+        detail_resp = self.client.get(reverse('store:product_detail', kwargs={'slug': self.product.slug}))
+        self.assertEqual(detail_resp.status_code, 200)
+        self.assertContains(detail_resp, "aspect-square")
+
+    def test_filter_shows_results_and_reset_clears(self):
+        # 1. Filter by category
+        resp_filter = self.client.get(reverse('store:home'), {'category': 'panjabi'}, HTTP_HX_REQUEST='true')
+        self.assertEqual(resp_filter.status_code, 200)
+        self.assertTrue(resp_filter.context['has_active_filters'])
+        self.assertContains(resp_filter, "ব্যাকে যান (ফিল্টার রিসেট)")
+        self.assertContains(resp_filter, "Silk Cotton Panjabi")
+
+        # 2. Reset filter via ?reset=1
+        resp_reset = self.client.get(reverse('store:home'), {'reset': '1', 'category': 'panjabi'}, HTTP_HX_REQUEST='true')
+        self.assertEqual(resp_reset.status_code, 200)
+        self.assertFalse(resp_reset.context['has_active_filters'])
+        self.assertIsNone(resp_reset.context['selected_category'])
+
+        # 3. Product detail page contains back link to reset filters
+        detail_resp = self.client.get(reverse('store:product_detail', kwargs={'slug': self.product.slug}))
+        self.assertEqual(detail_resp.status_code, 200)
+        self.assertContains(detail_resp, "কালেকশনে ফিরে যান")
+        self.assertContains(detail_resp, "weaverel_reset_filters_on_back")
+
+

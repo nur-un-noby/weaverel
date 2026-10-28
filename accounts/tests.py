@@ -18,8 +18,26 @@ class AccountsTests(TestCase):
         self.assertTrue(valid_with_code)
         self.assertEqual(clean2, "01812345678")
 
+        # Test Bengali numerals
+        valid_bn, clean_bn = validate_bangladesh_phone("০১৭১২৩৪৫৬৭৮")
+        self.assertTrue(valid_bn)
+        self.assertEqual(clean_bn, "01712345678")
+
+        # Test formatted number with spaces and dashes
+        valid_fmt, clean_fmt = validate_bangladesh_phone("+88 01912-345 678")
+        self.assertTrue(valid_fmt)
+        self.assertEqual(clean_fmt, "01912345678")
+
+        # Test 10 digits without leading 0
+        valid_10, clean_10 = validate_bangladesh_phone("1712345678")
+        self.assertTrue(valid_10)
+        self.assertEqual(clean_10, "01712345678")
+
         invalid, _ = validate_bangladesh_phone("12345")
         self.assertFalse(invalid)
+
+        invalid_op, _ = validate_bangladesh_phone("01234567890")
+        self.assertFalse(invalid_op)
 
     def test_user_registration_and_profile_signal(self):
         url = reverse('accounts:register')
@@ -108,6 +126,20 @@ class AccountsTests(TestCase):
         response = self.client.post(login_url, {
             'username': 'arif@example.com',
             'password': 'Secr3tPassword!',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(int(self.client.session['_auth_user_id']), user.pk)
+
+    def test_login_with_phone_number_and_password(self):
+        """Users can authenticate using their registered mobile number and password."""
+        user = User.objects.create_user(username='phone_customer', email='phone@example.com', password='PhonePass123!')
+        user.profile.phone_number = '01712345678'
+        user.profile.save()
+
+        login_url = reverse('accounts:login')
+        response = self.client.post(login_url, {
+            'username': '01712345678',
+            'password': 'PhonePass123!',
         })
         self.assertEqual(response.status_code, 302)
         self.assertEqual(int(self.client.session['_auth_user_id']), user.pk)
